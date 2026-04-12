@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VERONAGRAM ULTIMATE</title>
+    <title>VERONAGRAM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -13,18 +13,29 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
+        /* Экраны */
         .screen { display: none; height: 100vh; width: 100%; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* РЕГИСТРАЦИЯ */
+        /* ВХОД / РЕГИСТРАЦИЯ (С ЛОГО ВОРОНЫ) */
         #login-screen { justify-content: center; align-items: center; background: radial-gradient(circle at top, #1e2a38, #0e1621); }
-        .auth-card { width: 90%; max-width: 400px; background: var(--panel); padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .auth-card input, .auth-card textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid transparent; background: var(--bg); color: #fff; outline: none; }
-        .auth-card input:focus { border-color: var(--accent); }
-        .avatar-upload { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; overflow: hidden; border: 3px solid var(--accent); }
-        .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .auth-card { width: 90%; max-width: 400px; background: var(--panel); padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; }
+        
+        /* БЕЛАЯ ВОРОНА (ЛОГО) */
+        .verona-logo { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); margin: -60px auto 20px; display: flex; align-items: center; justify-content: center; border: 4px solid var(--panel); color: #fff; font-size: 40px; }
 
-        /* ИНТЕРФЕЙС */
+        .auth-card h2 { margin-bottom: 20px; color: #fff; }
+        .auth-card input, .auth-card textarea { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 2px solid transparent; background: var(--bg); color: #fff; outline: none; }
+        .auth-card textarea { resize: none; height: 80px; }
+        .auth-card input:focus { border-color: var(--accent); }
+        
+        /* КНОПКА ВОЙТИ / РЕГИСТРАЦИЯ */
+        .btn-main { padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px; transition: 0.2s; background: var(--accent); color: #fff; width: 100%; }
+
+        /* ПЕРЕКЛЮЧАТЕЛЬ */
+        .auth-switch { margin-top: 15px; color: var(--sub); font-size: 14px; cursor: pointer; text-decoration: underline; }
+
+        /* ОСНОВНОЙ КОНТЕЙНЕР (ПОСЛЕ ВХОДА) */
         .app-container { display: flex; width: 100%; height: 100%; }
         .nav-bar { width: 75px; background: #080e16; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; border-right: 1px solid rgba(255,255,255,0.05); }
         .nav-bar i { font-size: 24px; color: var(--sub); cursor: pointer; }
@@ -35,24 +46,9 @@
         .tab-content.active { display: flex; }
         .tab-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* ПОИСК */
-        .search-wrap { padding: 15px; }
-        .search-input { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--bg); color: #fff; outline: none; }
-        .result-card { background: var(--bg); border-radius: 15px; padding: 20px; margin-top: 20px; text-align: center; display: none; border: 1px solid var(--accent); }
-        
-        .btn { padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 10px; transition: 0.2s; }
-        .btn-main { background: var(--accent); color: #fff; width: 100%; }
-        .btn-group { display: flex; gap: 10px; width: 100%; }
-        .btn-danger { background: var(--danger); color: #fff; flex: 1; }
-        .btn-add { background: var(--success); color: #fff; flex: 1; }
-
         /* ЧАТ */
         .chat-view { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
         .chat-header { padding: 15px; background: var(--panel); display: flex; align-items: center; gap: 15px; }
-        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { max-width: 80%; padding: 12px; border-radius: 15px; }
-        .sent { background: var(--msg-out); align-self: flex-end; }
-        .received { background: var(--msg-in); align-self: flex-start; }
         .input-bar { padding: 15px; background: var(--panel); display: flex; gap: 10px; align-items: center; }
         .input-bar input { flex: 1; background: var(--bg); border: none; padding: 12px; border-radius: 20px; color: #fff; outline: none; }
 
@@ -61,26 +57,28 @@
             .sidebar { width: 100%; padding-bottom: 60px; }
             .chat-view { position: fixed; inset: 0; transform: translateX(100%); transition: 0.3s; z-index: 100; }
             .chat-view.active { transform: translateX(0); }
-            .back-btn { display: block !important; }
         }
-        .back-btn { display: none; font-size: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="screen active">
         <div class="auth-card">
-            <div class="avatar-upload" onclick="document.getElementById('file').click()">
-                <i class="fas fa-camera" id="icon"></i>
-                <img id="prev" src="" style="display:none">
+            <div class="verona-logo">
+                <i class="fas fa-crow"></i>
             </div>
-            <input type="file" id="file" hidden onchange="upload(this)">
-            <h2>Регистрация</h2>
-            <input type="text" id="reg-name" placeholder="Никнейм">
-            <input type="password" id="reg-pass" placeholder="Пароль">
-            <input type="email" id="reg-email" placeholder="Электронная почта">
-            <textarea id="reg-bio" placeholder="О себе..."></textarea>
-            <button class="btn btn-main" onclick="register()">Создать аккаунт</button>
+            <h2 id="auth-title">Вход</h2>
+            
+            <input type="text" id="auth-name" placeholder="Никнейм">
+            <input type="password" id="auth-pass" placeholder="Пароль">
+            
+            <div id="reg-fields" style="display:none">
+                <input type="email" id="reg-email" placeholder="Электронная почта">
+                <textarea id="reg-bio" placeholder="О себе..."></textarea>
+            </div>
+
+            <button class="btn-main" onclick="startApp()" id="auth-btn">Войти</button>
+            <div class="auth-switch" onclick="switchAuth()" id="auth-link">Нет аккаунта? Зарегистрироваться</div>
         </div>
     </div>
 
@@ -94,137 +92,65 @@
             </nav>
 
             <aside class="sidebar">
-                <div id="tab-chats" class="tab-content active">
-                    <div class="tab-header">Чаты</div>
-                    <div id="chats-list" style="padding:15px; color:var(--sub)">Список пуст...</div>
-                </div>
-
-                <div id="tab-search" class="tab-content">
-                    <div class="tab-header">Поиск</div>
-                    <div class="search-wrap">
-                        <input type="text" class="search-input" id="s-input" placeholder="Введите @id..." oninput="find()">
-                        <div id="s-card" class="result-card">
-                            <div class="avatar-upload" style="cursor:default"><i class="fas fa-user-shield"></i></div>
-                            <h3 id="res-name">Admin</h3>
-                            <div class="btn-group">
-                                <button class="btn btn-add" onclick="alert('Запрос отправлен!')">Добавить</button>
-                                <button class="btn btn-danger" onclick="alert('Заблокирован!')">Блок</button>
-                            </div>
-                            <button class="btn btn-main" onclick="start('Admin')">Написать</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-privacy" class="tab-content">
-                    <div class="tab-header">Конфиденциальность</div>
-                    <div style="padding:20px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                            Скрывать онлайн <i class="fas fa-toggle-on" style="color:var(--accent)"></i>
-                        </div>
-                        <div style="display:flex; justify-content:space-between;">
-                            Двухэтапный вход <i class="fas fa-toggle-off"></i>
-                        </div>
-                    </div>
-                </div>
-
+                <div id="tab-chats" class="tab-content active"><div class="tab-header">Чаты</div><div style="padding:15px;color:var(--sub)">Список пуст</div></div>
+                <div id="tab-search" class="tab-content"><div class="tab-header">Поиск</div></div>
+                <div id="tab-privacy" class="tab-content"><div class="tab-header">Приватность</div></div>
                 <div id="tab-profile" class="tab-content">
-                    <div class="tab-header">Мой Профиль</div>
-                    <div style="text-align:center; padding:20px;">
-                        <div class="avatar-upload" id="my-pic" style="cursor:default"></div>
-                        <h2 id="my-name">Имя</h2>
-                        <p id="my-email" style="color:var(--sub); font-size:14px;"></p>
-                        <p id="my-bio" style="margin-top:10px;"></p>
-                        <button class="btn btn-main" onclick="verify()" id="v-btn">Верифицировать почту</button>
-                        <button class="btn btn-danger" style="width:100%" onclick="location.reload()">Выйти</button>
+                    <div class="tab-header">Профиль</div>
+                    <div style="padding:20px;text-align:center;">
+                        <div class="verona-logo" style="margin: 0 auto 20px;"><i class="fas fa-user"></i></div>
+                        <h2 id="profile-nick">User</h2>
+                        <button class="btn-main" onclick="location.reload()" style="background:var(--danger)">Выйти</button>
                     </div>
                 </div>
             </aside>
-
-            <main class="chat-view" id="chat">
-                <div class="chat-header">
-                    <i class="fas fa-arrow-left back-btn" onclick="toggle(false)"></i>
-                    <b id="chat-title">Чат не выбран</b>
-                </div>
-                <div class="messages" id="msgs"></div>
-                <div class="input-bar">
-                    <input type="text" id="m-input" placeholder="Написать..." onkeypress="if(event.key==='Enter')send()">
-                    <i class="fas fa-paper-plane" style="color:var(--accent); cursor:pointer" onclick="send()"></i>
-                </div>
-            </main>
+            <main class="chat-view"><div class="chat-header"><b>Чат не выбран</b></div></main>
         </div>
     </div>
 
     <script>
-        let me = {};
+        let isLogin = true;
 
-        function upload(el) {
-            const f = el.files[0];
-            if (f) {
-                const r = new FileReader();
-                r.onload = e => {
-                    document.getElementById('prev').src = e.target.result;
-                    document.getElementById('prev').style.display = 'block';
-                    document.getElementById('icon').style.display = 'none';
-                };
-                r.readAsDataURL(f);
+        // Переключатель Регистрация / Вход
+        function switchAuth() {
+            isLogin = !isLogin;
+            const fields = document.getElementById('reg-fields');
+            const title = document.getElementById('auth-title');
+            const btn = document.getElementById('auth-btn');
+            const link = document.getElementById('auth-link');
+
+            if (isLogin) {
+                fields.style.display = 'none';
+                title.innerText = 'Вход';
+                btn.innerText = 'Войти';
+                link.innerText = 'Нет аккаунта? Зарегистрироваться';
+            } else {
+                fields.style.display = 'block';
+                title.innerText = 'Регистрация';
+                btn.innerText = 'Создать аккаунт';
+                link.innerText = 'Уже есть аккаунт? Войти';
             }
         }
 
-        function register() {
-            me = {
-                name: document.getElementById('reg-name').value,
-                pass: document.getElementById('reg-pass').value,
-                email: document.getElementById('reg-email').value,
-                bio: document.getElementById('reg-bio').value,
-                img: document.getElementById('prev').src
-            };
-
-            if(!me.name || !me.pass) return alert("Введите ник и пароль!");
-
-            document.getElementById('my-name').innerText = me.name;
-            document.getElementById('my-email').innerText = me.email;
-            document.getElementById('my-bio').innerText = me.bio;
-            if(me.img) document.getElementById('my-pic').innerHTML = `<img src="${me.img}">`;
-
+        // КНОПКА "СТАРТ"
+        function startApp() {
+            const name = document.getElementById('auth-name').value;
+            if(!name) return alert("Введите никнейм!");
+            
+            // Ставим имя в профиль
+            document.getElementById('profile-nick').innerText = name;
+            
+            // Переключаем экраны
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('app-screen').classList.add('active');
         }
 
+        // Переключатель вкладок
         function tab(name, el) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-bar i').forEach(i => i.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
             el.classList.add('active');
-        }
-
-        function find() {
-            const q = document.getElementById('s-input').value.toLowerCase();
-            document.getElementById('s-card').style.display = (q === '@admin') ? 'block' : 'none';
-        }
-
-        function start(name) {
-            document.getElementById('chat-title').innerText = name;
-            document.getElementById('chats-list').innerHTML = `<div onclick="toggle(true)" style="padding:15px; background:var(--accent); border-radius:10px; cursor:pointer"><b>${name}</b><br><small>Нажмите, чтобы открыть</small></div>`;
-            toggle(true);
-        }
-
-        function toggle(s) { document.getElementById('chat').classList.toggle('active', s); }
-
-        function send() {
-            const i = document.getElementById('m-input');
-            if(!i.value) return;
-            document.getElementById('msgs').innerHTML += `<div class="bubble sent">${i.value}</div>`;
-            i.value = "";
-            document.getElementById('msgs').scrollTop = 9999;
-        }
-
-        function verify() {
-            const code = prompt("Код отправлен на " + me.email + ". Введите код 1234:");
-            if(code === "1234") {
-                alert("Успешно!");
-                document.getElementById('v-btn').innerText = "✓ Верифицирован";
-                document.getElementById('v-btn').style.background = var(--success);
-            }
         }
     </script>
 </body>
