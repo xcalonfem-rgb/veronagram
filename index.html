@@ -17,7 +17,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* УВЕДОМЛЕНИЕ */
         #toast { 
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
             background: var(--panel); border: 1px solid var(--accent); box-shadow: var(--neon);
@@ -25,7 +24,6 @@
             display: flex; align-items: center; gap: 12px; cursor: pointer; min-width: 280px;
         }
 
-        /* НАВИГАЦИЯ */
         .nav-bar { width: 75px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 35px; border-right: 1px solid rgba(0,242,254,0.1); z-index: 100; }
         .nav-bar i { font-size: 22px; color: var(--sub); cursor: pointer; transition: 0.3s; }
         .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
@@ -34,28 +32,17 @@
         .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 80px; }
         .tab-content.active { display: flex; }
 
-        /* СКРОЛЛ */
-        .tab-content::-webkit-scrollbar { width: 4px; }
-        .tab-content::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-
         .btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; box-shadow: var(--neon); font-size: 11px; }
 
         .user-card { display: flex; align-items: center; padding: 15px 20px; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .user-card img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); }
-
-        .post-card { background: var(--glass); margin: 15px; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
-        .post-card img { width: 100%; max-height: 400px; object-fit: cover; }
-        .post-actions { display: flex; align-items: center; gap: 20px; padding: 12px 15px; border-top: 1px solid rgba(255,255,255,0.05); }
 
         .msg-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .msg { max-width: 80%; padding: 12px; border-radius: 18px; font-size: 14px; position: relative; animation: pop 0.3s ease; }
         .msg.me { align-self: flex-end; background: var(--accent); color: #000; border-bottom-right-radius: 2px; }
         .msg.other { align-self: flex-start; background: #21262d; border-bottom-left-radius: 2px; }
         
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-content { background: var(--panel); padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; border: 1px solid var(--accent); text-align: center; }
-
-        input, textarea { background: #000; border: 1px solid #333; padding: 12px; border-radius: 12px; color: #fff; margin: 5px 0; width: 100%; outline: none; }
+        input { background: #000; border: 1px solid #333; padding: 12px; border-radius: 12px; color: #fff; margin: 5px 0; width: 100%; outline: none; }
         .rec-active { color: #ff2e2e !important; text-shadow: 0 0 10px #ff2e2e; }
 
         .screen { display: none; width: 100%; height: 100%; }
@@ -77,30 +64,6 @@
     <div id="toast-msg" style="font-size:13px"></div>
 </div>
 
-<div id="view-modal" class="modal" onclick="this.style.display='none'">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <img id="v-ava" src="" style="width:110px; height:110px; border-radius:50%; border:3px solid var(--accent); margin-bottom:15px; object-fit:cover;">
-        <h2 id="v-name"></h2>
-        <p id="v-nick" style="color:var(--accent); font-weight:bold"></p>
-        <p id="v-bio" style="margin-top:15px; color:var(--sub); font-style:italic"></p>
-        <button class="btn" onclick="document.getElementById('view-modal').style.display='none'" style="margin-top:20px; width:100%">ЗАКРЫТЬ</button>
-    </div>
-</div>
-
-<div id="edit-modal" class="modal">
-    <div class="modal-content">
-        <label style="cursor:pointer">
-            <img id="e-ava-preview" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--accent); object-fit:cover">
-            <input type="file" hidden onchange="uploadFile(this, 'ava')">
-            <p style="font-size:10px; color:var(--accent); margin:10px 0">ИЗМЕНИТЬ АВАТАР</p>
-        </label>
-        <input type="text" id="e-name" placeholder="Имя">
-        <textarea id="e-bio" placeholder="О себе..."></textarea>
-        <button class="btn" onclick="saveProfile()" style="width:100%; margin-top:10px">СОХРАНИТЬ</button>
-        <button class="btn" onclick="closeEdit()" style="background:none; color:var(--sub); box-shadow:none">ОТМЕНА</button>
-    </div>
-</div>
-
 <div id="login-screen" class="screen active">
     <div style="margin:auto; background:var(--panel); padding:40px; border-radius:35px; text-align:center; width:90%; max-width:400px; border: 1px solid var(--accent); box-shadow: var(--neon);">
         <i class="fas fa-crown" style="font-size:40px; color:var(--accent); text-shadow:var(--neon); margin-bottom:15px"></i>
@@ -117,7 +80,6 @@
         <i class="fas fa-comment-dots active" onclick="tab('chats')" id="n-chats"></i>
         <i class="fas fa-search" onclick="tab('search')" id="n-search"></i>
         <i class="fas fa-user-astronaut" onclick="tab('prof')" id="n-prof"></i>
-        <i class="fas fa-palette" onclick="tab('pal')" id="n-pal"></i>
     </nav>
 
     <aside class="sidebar">
@@ -131,40 +93,24 @@
             <div id="s-res"></div>
         </div>
         <div id="t-prof" class="tab-content">
-            <div style="height:110px; background:linear-gradient(var(--accent), transparent); opacity:0.3"></div>
-            <div id="my-ava-main" style="width:100px;height:100px;border-radius:50%;margin:-50px auto 10px;border:3px solid var(--panel);overflow:hidden;background:#222;box-shadow:var(--neon)"></div>
+            <div id="my-ava-main" style="width:100px;height:100px;border-radius:50%;margin:30px auto 10px;border:3px solid var(--accent);overflow:hidden;background:#222;box-shadow:var(--neon)"></div>
             <div style="text-align:center">
                 <h2 id="m-name"></h2>
                 <small id="m-nick" style="color:var(--accent)"></small>
-                <p id="m-bio" style="padding:15px; font-size:13px; color:var(--sub)"></p>
-                <button class="btn" onclick="openEdit()" style="padding:8px 20px">РЕДАКТИРОВАТЬ</button>
+                <div style="padding:20px">
+                    <label class="btn" style="display:block; cursor:pointer">
+                        СМЕНИТЬ АВАТАР
+                        <input type="file" hidden onchange="uploadFile(this)">
+                    </label>
+                </div>
             </div>
-            <div style="padding:20px; margin-top:20px; background:rgba(255,255,255,0.02)">
-                <label style="display:block; text-align:center; padding:15px; border:1px dashed var(--accent); border-radius:15px; cursor:pointer; margin-bottom:10px">
-                    📸 ДОБАВИТЬ ФОТО В ЛЕНТУ
-                    <input type="file" hidden onchange="uploadFile(this, 'post')">
-                </label>
-                <textarea id="p-txt" placeholder="Текст поста..." style="height:60px"></textarea>
-                <button class="btn" onclick="addPost()" style="width:100%">ОПУБЛИКОВАТЬ</button>
-            </div>
-            <div id="my-posts" style="padding-bottom:100px;"></div>
-        </div>
-        <div id="t-pal" class="tab-content">
-             <div style="padding:25px; font-weight:900">CUSTOM THEME</div>
-             <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:15px; padding:20px">
-                <div style="height:50px; background:#00f2fe; border-radius:12px; box-shadow:0 0 10px #00f2fe" onclick="setTheme('#00f2fe')"></div>
-                <div style="height:50px; background:#ff007c; border-radius:12px; box-shadow:0 0 10px #ff007c" onclick="setTheme('#ff007c')"></div>
-                <div style="height:50px; background:#39ff14; border-radius:12px; box-shadow:0 0 10px #39ff14" onclick="setTheme('#39ff14')"></div>
-             </div>
         </div>
     </aside>
 
     <main class="chat-main" id="chat-window" style="flex:1; display:flex; flex-direction:column; background:#080a0d">
         <div style="padding:15px; background:var(--panel); display:flex; align-items:center; gap:15px; border-bottom:1px solid #222">
             <i class="fas fa-chevron-left" onclick="closeChat()" style="color:var(--accent); cursor:pointer"></i>
-            <img id="chat-top-ava" src="" onclick="viewUser(currentChatUser)" style="width:40px;height:40px;border-radius:50%;cursor:pointer;border:1px solid var(--accent)">
             <b id="chat-top-name">Чат</b>
-            <i class="fas fa-trash-alt" style="margin-left:auto; color:var(--sub); cursor:pointer" onclick="deleteEntireChat()"></i>
         </div>
         <div class="msg-box" id="messages"></div>
         <div id="input-area" style="padding:15px; background:var(--panel); display:none; align-items:center; gap:12px">
@@ -176,23 +122,22 @@
 </div>
 
 <script>
-    // ВСТАВЬ СВОЙ КЛЮЧ IMGBB НИЖЕ
+    // ТВОИ КЛЮЧИ ИЗ СКРИНШОТОВ
     const IMGBB_KEY = "a4feb69baa5d7a0b6e9d3f4f80ce72bd"; 
 
     const firebaseConfig = {
         apiKey: "AIzaSyDQWF2K9Pmb_xIYbELL0I95yQgNGQeAr4g",
-        authDomain: "veronagram-aafc1.firebaseapp.com",
         databaseURL: "https://veronagram-aafc1-default-rtdb.firebaseio.com",
         projectId: "veronagram-aafc1",
         storageBucket: "veronagram-aafc1.appspot.com",
-        messagingSenderId: "292300518581",
         appId: "1:292300518581:web:5bdcfe32aa4fbcdef83afc"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    let me = JSON.parse(localStorage.getItem('v-pro-max-user')) || null;
-    let currentChat = null, currentChatUser = null, tempPostImg = "";
+    let me = JSON.parse(localStorage.getItem('v-user')) || null;
+    let currentChat = null, currentChatUser = null;
     let mediaRecorder, audioChunks = [];
 
     if(me) loginOk(me);
@@ -214,43 +159,29 @@
     }
 
     function loginOk(u) {
-        me = u; localStorage.setItem('v-pro-max-user', JSON.stringify(me));
+        me = u; localStorage.setItem('v-user', JSON.stringify(me));
         document.getElementById('login-screen').classList.remove('active');
         document.getElementById('app-screen').classList.add('active');
-        updateUI(); loadFriends(); loadPosts(); listenNotify();
+        updateUI(); loadFriends(); listenNotify();
     }
 
-    async function uploadFile(input, mode) {
+    async function uploadFile(input) {
         const file = input.files[0]; if(!file) return;
         const formData = new FormData(); formData.append("image", file);
-        try {
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
-            const data = await res.json();
-            if(data.success) {
-                const url = data.data.url;
-                if(mode === 'ava') {
-                    me.ava = url; await db.ref('users/'+me.nick).update({ava: url});
-                    updateUI();
-                } else { tempPostImg = url; alert("Фото загружено и готово к публикации!"); }
-            }
-        } catch(e) { alert("Ошибка загрузки. Проверь API ключ ImgBB."); }
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+        const data = await res.json();
+        if(data.success) {
+            const url = data.data.url;
+            me.ava = url; await db.ref('users/'+me.nick).update({ava: url});
+            updateUI();
+        }
     }
 
     function updateUI() {
         document.getElementById('m-name').innerText = me.name;
         document.getElementById('m-nick').innerText = "@" + me.nick;
-        document.getElementById('m-bio').innerText = me.bio;
         const img = me.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
         document.getElementById('my-ava-main').innerHTML = `<img src="${img}" style="width:100%;height:100%;object-fit:cover">`;
-        document.getElementById('e-ava-preview').src = img;
-    }
-
-    async function saveProfile() {
-        me.name = document.getElementById('e-name').value || me.name;
-        me.bio = document.getElementById('e-bio').value || me.bio;
-        await db.ref('users/'+me.nick).update(me);
-        localStorage.setItem('v-pro-max-user', JSON.stringify(me));
-        updateUI(); closeEdit();
     }
 
     function findUsers() {
@@ -263,19 +194,16 @@
                 if(n.includes(q) && n !== me.nick) {
                     const u = users[n];
                     const d = document.createElement('div'); d.className = 'user-card';
-                    d.innerHTML = `<img src="${u.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><b>${u.name}</b><button onclick="addFriend('${n}')" class="btn" style="margin-left:auto">ДОБАВИТЬ</button>`;
-                    d.onclick = () => viewUser(n);
+                    d.innerHTML = `<img src="${u.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><b>${u.name}</b><button class="btn" onclick="addFriend('${n}','${u.name}','${u.ava}')" style="margin-left:auto">ЧАТ</button>`;
                     res.appendChild(d);
                 }
             }
         });
     }
 
-    async function addFriend(nick) {
-        const s = await db.ref('users/'+nick).once('value');
-        const u = s.val();
-        await db.ref('friends/'+me.nick+'/'+nick).set({ name: u.name, ava: u.ava });
-        alert("Пользователь добавлен в контакты!");
+    async function addFriend(nick, name, ava) {
+        await db.ref('friends/'+me.nick+'/'+nick).set({ name, ava });
+        openChat(nick, name, ava);
     }
 
     function loadFriends() {
@@ -285,7 +213,7 @@
             for(let n in data) {
                 const f = data[n];
                 const d = document.createElement('div'); d.className = 'user-card';
-                d.innerHTML = `<img src="${f.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><div><b>${f.name}</b><br><small>@${n}</small></div>`;
+                d.innerHTML = `<img src="${f.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><b>${f.name}</b>`;
                 d.onclick = () => openChat(n, f.name, f.ava);
                 list.appendChild(d);
             }
@@ -296,7 +224,6 @@
         currentChatUser = nick;
         currentChat = [me.nick, nick].sort().join("_");
         document.getElementById('chat-top-name').innerText = name;
-        document.getElementById('chat-top-ava').src = ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
         document.getElementById('input-area').style.display = "flex";
         document.getElementById('chat-window').classList.add('active');
 
@@ -308,8 +235,7 @@
                 const m = data[id];
                 const d = document.createElement('div'); d.className = m.s === me.nick ? "msg me" : "msg other";
                 if(m.type === 'voice') d.innerHTML = `<audio src="${m.t}" controls style="width:180px;height:35px"></audio>`;
-                else d.innerHTML = m.t;
-                d.innerHTML += `<small style="display:block;font-size:8px;opacity:0.4;margin-top:5px" onclick="delMsg('${id}')">удалить</small>`;
+                else d.innerText = m.t;
                 box.appendChild(d);
             }
             box.scrollTop = box.scrollHeight;
@@ -319,26 +245,24 @@
     function sendMsg(text, type = 'text') {
         const t = text || document.getElementById('msg-in').value.trim();
         if(!t) return;
-        db.ref('messages/'+currentChat).push({ s: me.nick, t: t, type: type, time: Date.now() });
-        db.ref('notify/'+currentChatUser).set({ from: me.name, t: type==='voice'?'🎤 Голосовое':t, ava: me.ava, time: Date.now() });
+        db.ref('messages/'+currentChat).push({ s: me.nick, t: t, type: type });
+        db.ref('notify/'+currentChatUser).set({ from: me.name, t: type==='voice'?'Голосовое':t, ava: me.ava, time: Date.now() });
         document.getElementById('msg-in').value = "";
     }
 
     async function toggleRecord() {
         const btn = document.getElementById('rec-btn');
         if (!mediaRecorder || mediaRecorder.state === "inactive") {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(new Blob(audioChunks));
-                    reader.onloadend = () => { sendMsg(reader.result, 'voice'); };
-                };
-                mediaRecorder.start(); btn.classList.add('rec-active');
-            } catch(e) { alert("Нет доступа к микрофону!"); }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const reader = new FileReader();
+                reader.readAsDataURL(new Blob(audioChunks));
+                reader.onloadend = () => sendMsg(reader.result, 'voice');
+            };
+            mediaRecorder.start(); btn.classList.add('rec-active');
         } else { mediaRecorder.stop(); btn.classList.remove('rec-active'); }
     }
 
@@ -354,58 +278,12 @@
         });
     }
 
-    async function viewUser(nick) {
-        const s = await db.ref('users/'+nick).once('value');
-        const u = s.val();
-        document.getElementById('v-ava').src = u.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-        document.getElementById('v-name').innerText = u.name;
-        document.getElementById('v-nick').innerText = "@" + u.nick;
-        document.getElementById('v-bio').innerText = u.bio || "Элитный участник Verona";
-        document.getElementById('view-modal').style.display = 'flex';
-    }
-
-    async function addPost() {
-        const txt = document.getElementById('p-txt').value;
-        if(!tempPostImg && !txt) return;
-        await db.ref('posts/'+me.nick).push({ url: tempPostImg, txt, likes: 0, time: Date.now() });
-        tempPostImg = ""; document.getElementById('p-txt').value = "";
-    }
-
-    function loadPosts() {
-        db.ref('posts/'+me.nick).on('value', s => {
-            const box = document.getElementById('my-posts'); box.innerHTML = "";
-            const data = s.val();
-            for(let id in data) {
-                const p = data[id];
-                const d = document.createElement('div'); d.className = 'post-card';
-                d.innerHTML = `${p.url ? `<img src="${p.url}">` : ''}<div style="padding:15px">${p.txt}</div>
-                <div class="post-actions"><span onclick="db.ref('posts/${me.nick}/${id}/likes').transaction(c=>(c||0)+1)"><i class="fas fa-heart" style="color:#ff2e2e"></i> ${p.likes || 0}</span>
-                <i class="fas fa-trash" style="margin-left:auto;opacity:0.3" onclick="db.ref('posts/${me.nick}/${id}').remove()"></i></div>`;
-                box.prepend(d);
-            }
-        });
-    }
-
     function tab(t) {
         document.querySelectorAll('.tab-content, .nav-bar i').forEach(el => el.classList.remove('active'));
         document.getElementById('t-'+t).classList.add('active');
         document.getElementById('n-'+t).classList.add('active');
     }
-
-    function setTheme(c) {
-        document.documentElement.style.setProperty('--accent', c);
-        document.documentElement.style.setProperty('--neon', `0 0 15px ${c}`);
-    }
-
     function closeChat() { document.getElementById('chat-window').classList.remove('active'); }
-    function openEdit() { 
-        document.getElementById('e-name').value = me.name;
-        document.getElementById('e-bio').value = me.bio;
-        document.getElementById('edit-modal').style.display = "flex"; 
-    }
-    function closeEdit() { document.getElementById('edit-modal').style.display = "none"; }
-    function delMsg(id) { db.ref('messages/'+currentChat+'/'+id).remove(); }
-    function deleteEntireChat() { if(confirm("Стереть всю историю переписки?")) db.ref('messages/'+currentChat).remove(); }
 </script>
 </body>
 </html>
