@@ -2,60 +2,201 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VERONAGRAM - Вход</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VERONAGRAM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="auth-page dark-theme">
+    <style>
+        :root {
+            --accent: #5865f2; --bg: #0e1621; --panel: #17212b;
+            --text: #fff; --sub: #708499; --msg-in: #182533; --msg-out: #2b5278;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-    <div id="splash-screen">
-        <div class="crow-logo"><i class="fas fa-crow"></i></div>
-        <h1 class="splash-title">VERONAGRAM</h1>
+        /* Экраны */
+        .screen { display: none; height: 100vh; width: 100%; position: relative; }
+        .screen.active { display: flex; }
+
+        /* Вход */
+        #login-screen { flex-direction: column; justify-content: center; align-items: center; background: radial-gradient(circle at top, #1e2a38, #0e1621); }
+        .login-card { width: 85%; max-width: 320px; text-align: center; }
+        .login-card input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: none; background: var(--panel); color: #fff; outline: none; }
+        .login-btn { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-weight: bold; margin-top: 10px; cursor: pointer; }
+
+        /* Основной интерфейс */
+        .app-container { display: flex; width: 100%; height: 100%; overflow: hidden; }
+
+        /* Боковое меню (Слайдер) */
+        .side-menu { position: fixed; left: -100%; top: 0; width: 280px; height: 100%; background: var(--panel); z-index: 1000; transition: 0.3s; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+        .side-menu.open { left: 0; }
+        .menu-header { padding: 30px 20px; background: var(--accent); }
+        .menu-items li { padding: 15px 20px; display: flex; align-items: center; gap: 15px; list-style: none; cursor: pointer; }
+
+        /* Список чатов */
+        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid rgba(0,0,0,0.2); flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
+        .search-bar { flex: 1; background: var(--bg); border: none; padding: 10px; border-radius: 8px; color: #fff; outline: none; font-size: 14px; }
+
+        .chat-list { flex: 1; overflow-y: auto; }
+        .chat-item { display: flex; padding: 12px; gap: 12px; cursor: pointer; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--msg-out); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+        /* Окно чата */
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
+        .chat-header { padding: 12px 15px; background: var(--panel); display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; }
+        .received { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .sent { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        /* Поле ввода */
+        .input-area { padding: 10px; background: var(--bg); }
+        .input-wrapper { background: var(--panel); border-radius: 20px; display: flex; align-items: center; padding: 5px 15px; gap: 10px; }
+        .input-wrapper input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px 0; outline: none; }
+        .dc-btn { color: var(--accent); font-size: 22px; cursor: pointer; border: none; background: none; }
+
+        /* Стикеры */
+        .sticker-panel { display: none; grid-template-columns: repeat(4, 1fr); padding: 10px; background: var(--panel); position: absolute; bottom: 70px; left: 10px; right: 10px; border-radius: 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
+        .sticker-panel.show { display: grid; }
+        .sticker-panel span { font-size: 35px; text-align: center; padding: 5px; cursor: pointer; }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; }
+            .chat-main { position: fixed; right: -100%; top: 0; width: 100%; height: 100%; transition: 0.3s; z-index: 100; }
+            .chat-main.open { right: 0; }
+            .mobile-back { display: block !important; }
+        }
+        .mobile-back { display: none; cursor: pointer; font-size: 20px; }
+        
+        .tg-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--accent); padding: 10px 20px; border-radius: 20px; z-index: 3000; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="tg-toast"></div>
+
+    <div id="login-screen" class="screen active">
+        <div class="login-card">
+            <i class="fas fa-crow" style="font-size: 60px; margin-bottom: 20px;"></i>
+            <h2>VERONAGRAM</h2>
+            <input type="text" id="user-name" placeholder="Твоё имя">
+            <button class="login-btn" onclick="startApp()">Войти</button>
+        </div>
     </div>
 
-    <div class="auth-card" id="auth-content" style="display: none;">
-        <div class="auth-header">
-            <div class="brand-icon"><i class="fas fa-crow"></i></div>
-            <h2>VERONAGRAM</h2>
-            <p class="safety-text" id="typing-text"></p>
+    <div id="app-screen" class="screen">
+        <nav id="menu" class="side-menu">
+            <div class="menu-header">
+                <div class="avatar" style="background: rgba(255,255,255,0.2);"><i class="fas fa-user"></i></div>
+                <div style="margin-top:10px;"><b id="my-name">User</b></div>
+            </div>
+            <ul class="menu-items">
+                <li onclick="showToast('Verona Premium Активен!')"><i class="fas fa-crown" style="color:gold"></i> Verona Premium</li>
+                <li onclick="showToast('Настройки защищены')"><i class="fas fa-user-shield"></i> Конфиденциальность</li>
+                <li onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Выйти</li>
+            </ul>
+        </nav>
+
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <i class="fas fa-bars" onclick="toggleMenu()"></i>
+                    <input type="text" class="search-bar" id="search" placeholder="Поиск @id..." oninput="searchUser()">
+                </div>
+                <div class="chat-list" id="clist">
+                    <div class="chat-item" onclick="openChat('Verona Support')">
+                        <div class="avatar"><i class="fas fa-crow"></i></div>
+                        <div><b>Verona Support</b><br><small style="color:var(--sub)">Онлайн</small></div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="chat-main" id="cmain">
+                <div class="chat-header">
+                    <i class="fas fa-arrow-left mobile-back" onclick="closeChat()"></i>
+                    <b id="chat-title">Чат</b>
+                </div>
+                
+                <div class="messages" id="msgs">
+                    <div class="bubble received">Привет! Теперь всё работает и на телефоне. Попробуй поиск @admin или стикеры.</div>
+                </div>
+
+                <div class="sticker-panel" id="spanel">
+                    <span onclick="sendEmoji('🕊️')">🕊️</span>
+                    <span onclick="sendEmoji('🦅')">🦅</span>
+                    <span onclick="sendEmoji('🦉')">🦉</span>
+                    <span onclick="sendEmoji('🔥')">🔥</span>
+                </div>
+
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <i class="far fa-smile" onclick="toggleStickers()" style="cursor:pointer; color:var(--sub)"></i>
+                        <input type="text" id="m-input" placeholder="Сообщение..." onkeypress="if(event.key==='Enter')sendMsg()">
+                        <button class="dc-btn" onclick="sendMsg()"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </main>
         </div>
-
-        <form action="chats.html" class="auth-form">
-            <div class="input-wrapper">
-                <input type="text" placeholder="Логин или @id" class="clean-input" required>
-                <div class="input-line"></div>
-            </div>
-            
-            <div class="input-wrapper">
-                <input type="password" placeholder="Пароль" class="clean-input" required>
-                <div class="input-line"></div>
-            </div>
-
-            <button type="submit" class="tg-btn-main">ПРОДОЛЖИТЬ</button>
-        </form>
     </div>
 
     <script>
-        setTimeout(() => {
-            const splash = document.getElementById('splash-screen');
-            splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-                document.getElementById('auth-content').style.display = 'block';
-                startTyping(); 
-            }, 500);
-        }, 2000);
+        function startApp() {
+            const name = document.getElementById('user-name').value || "User";
+            document.getElementById('my-name').innerText = name;
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('app-screen').classList.add('active');
+        }
 
-        function startTyping() {
-            const text = "Твоя безопасность общения у нас!";
-            const container = document.getElementById('typing-text');
-            let i = 0;
-            const interval = setInterval(() => {
-                container.textContent += text[i];
-                i++;
-                if (i === text.length) clearInterval(interval);
-            }, 50);
+        function toggleMenu() { document.getElementById('menu').classList.toggle('open'); }
+        function toggleStickers() { document.getElementById('spanel').classList.toggle('show'); }
+
+        function openChat(name) {
+            document.getElementById('chat-title').innerText = name;
+            document.getElementById('cmain').classList.add('open');
+        }
+
+        function closeChat() { document.getElementById('cmain').classList.remove('open'); }
+
+        function sendMsg() {
+            const inp = document.getElementById('m-input');
+            if(!inp.value.trim()) return;
+            document.getElementById('msgs').innerHTML += `<div class="bubble sent">${inp.value}</div>`;
+            inp.value = "";
+            scrollMsgs();
+        }
+
+        function sendEmoji(e) {
+            document.getElementById('msgs').innerHTML += `<div class="bubble sent" style="background:none; font-size:40px">${e}</div>`;
+            toggleStickers();
+            scrollMsgs();
+        }
+
+        function scrollMsgs() {
+            const m = document.getElementById('msgs');
+            m.scrollTop = m.scrollHeight;
+        }
+
+        function searchUser() {
+            const v = document.getElementById('search').value.toLowerCase();
+            if(v === "@admin") {
+                const l = document.getElementById('clist');
+                if(!l.innerText.includes("Admin")) {
+                    l.innerHTML += `<div class="chat-item" onclick="openChat('Admin')">
+                        <div class="avatar" style="background:var(--accent)"><i class="fas fa-user-shield"></i></div>
+                        <div><b>Admin</b><br><small>Найден через поиск</small></div>
+                    </div>`;
+                    showToast("Пользователь найден");
+                }
+            }
+        }
+
+        function showToast(txt) {
+            const t = document.getElementById('toast');
+            t.innerText = txt;
+            t.style.display = "block";
+            setTimeout(() => t.style.display = "none", 2000);
+            if(document.getElementById('menu').classList.contains('open')) toggleMenu();
         }
     </script>
 </body>
