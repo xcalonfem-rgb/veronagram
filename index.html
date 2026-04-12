@@ -8,55 +8,60 @@
     <style>
         :root {
             --accent: #5865f2; --bg: #0e1621; --panel: #17212b;
-            --text: #fff; --sub: #708499; --msg-in: #182533; --msg-out: #2b5278; --danger: #ed4245; --success: #3ba55c;
+            --text: #fff; --sub: #708499;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* Экраны */
-        .screen { display: none; height: 100vh; width: 100%; flex-direction: column; }
+        /* ЭКРАН ВХОДА */
+        .screen { display: none; height: 100vh; width: 100%; flex-direction: column; justify-content: center; align-items: center; }
         .screen.active { display: flex; }
 
-        /* ВХОД / РЕГИСТРАЦИЯ (С ЛОГО ВОРОНЫ) */
-        #login-screen { justify-content: center; align-items: center; background: radial-gradient(circle at top, #1e2a38, #0e1621); }
-        .auth-card { width: 90%; max-width: 400px; background: var(--panel); padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; }
-        
-        /* БЕЛАЯ ВОРОНА (ЛОГО) */
-        .verona-logo { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); margin: -60px auto 20px; display: flex; align-items: center; justify-content: center; border: 4px solid var(--panel); color: #fff; font-size: 40px; }
+        .auth-card { 
+            width: 90%; max-width: 380px; background: var(--panel); 
+            padding: 40px 25px; border-radius: 25px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative;
+        }
 
-        .auth-card h2 { margin-bottom: 20px; color: #fff; }
-        .auth-card input, .auth-card textarea { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 2px solid transparent; background: var(--bg); color: #fff; outline: none; }
-        .auth-card textarea { resize: none; height: 80px; }
-        .auth-card input:focus { border-color: var(--accent); }
-        
-        /* КНОПКА ВОЙТИ / РЕГИСТРАЦИЯ */
-        .btn-main { padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 20px; transition: 0.2s; background: var(--accent); color: #fff; width: 100%; }
+        /* БЕЛАЯ ВОРОНА */
+        .verona-logo {
+            width: 90px; height: 90px; background: #fff;
+            border-radius: 50%; margin: -85px auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent); font-size: 45px;
+            border: 5px solid var(--panel);
+        }
 
-        /* ПЕРЕКЛЮЧАТЕЛЬ */
-        .auth-switch { margin-top: 15px; color: var(--sub); font-size: 14px; cursor: pointer; text-decoration: underline; }
+        input, textarea {
+            width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px;
+            border: 2px solid transparent; background: var(--bg); color: #fff; outline: none;
+        }
+        input:focus { border-color: var(--accent); }
 
-        /* ОСНОВНОЙ КОНТЕЙНЕР (ПОСЛЕ ВХОДА) */
+        .btn-main {
+            width: 100%; padding: 16px; border-radius: 12px; border: none;
+            background: var(--accent); color: #fff; font-weight: bold;
+            font-size: 16px; cursor: pointer; margin-top: 15px;
+        }
+
+        .auth-switch { margin-top: 20px; font-size: 14px; color: var(--sub); cursor: pointer; }
+        .auth-switch b { color: var(--accent); }
+
+        /* ИНТЕРФЕЙС ПРИЛОЖЕНИЯ */
         .app-container { display: flex; width: 100%; height: 100%; }
-        .nav-bar { width: 75px; background: #080e16; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; border-right: 1px solid rgba(255,255,255,0.05); }
+        .nav-bar { width: 70px; background: #080e16; display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 25px; }
         .nav-bar i { font-size: 24px; color: var(--sub); cursor: pointer; }
         .nav-bar i.active { color: var(--accent); }
 
-        .sidebar { width: 350px; background: var(--panel); display: flex; flex-direction: column; border-right: 1px solid rgba(0,0,0,0.2); }
-        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid #111; display: flex; flex-direction: column; }
+        .tab-content { display: none; flex-direction: column; height: 100%; }
         .tab-content.active { display: flex; }
-        .tab-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* ЧАТ */
-        .chat-view { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
-        .chat-header { padding: 15px; background: var(--panel); display: flex; align-items: center; gap: 15px; }
-        .input-bar { padding: 15px; background: var(--panel); display: flex; gap: 10px; align-items: center; }
-        .input-bar input { flex: 1; background: var(--bg); border: none; padding: 12px; border-radius: 20px; color: #fff; outline: none; }
+        .header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid #0002; }
 
         @media (max-width: 768px) {
-            .nav-bar { width: 100%; height: 60px; position: fixed; bottom: 0; flex-direction: row; justify-content: space-around; padding: 0; border-right: none; border-top: 1px solid #111; }
-            .sidebar { width: 100%; padding-bottom: 60px; }
-            .chat-view { position: fixed; inset: 0; transform: translateX(100%); transition: 0.3s; z-index: 100; }
-            .chat-view.active { transform: translateX(0); }
+            .app-container { flex-direction: column; }
+            .nav-bar { width: 100%; height: 65px; position: fixed; bottom: 0; flex-direction: row; justify-content: space-around; padding: 0; z-index: 100; }
+            .sidebar { width: 100%; flex: 1; padding-bottom: 65px; }
         }
     </style>
 </head>
@@ -64,97 +69,93 @@
 
     <div id="login-screen" class="screen active">
         <div class="auth-card">
-            <div class="verona-logo">
-                <i class="fas fa-crow"></i>
-            </div>
+            <div class="verona-logo"><i class="fas fa-crow"></i></div>
             <h2 id="auth-title">Вход</h2>
             
-            <input type="text" id="auth-name" placeholder="Никнейм">
-            <input type="password" id="auth-pass" placeholder="Пароль">
+            <input type="text" id="name-input" placeholder="Никнейм">
+            <input type="password" id="pass-input" placeholder="Пароль">
             
             <div id="reg-fields" style="display:none">
-                <input type="email" id="reg-email" placeholder="Электронная почта">
-                <textarea id="reg-bio" placeholder="О себе..."></textarea>
+                <input type="email" placeholder="Электронная почта">
+                <textarea placeholder="О себе..."></textarea>
             </div>
 
-            <button class="btn-main" onclick="startApp()" id="auth-btn">Войти</button>
-            <div class="auth-switch" onclick="switchAuth()" id="auth-link">Нет аккаунта? Зарегистрироваться</div>
+            <button class="btn-main" onclick="handleAuth()" id="auth-btn">Войти</button>
+            <div class="auth-switch" onclick="toggleAuth()">
+                <span id="switch-text">Нет аккаунта?</span> <b id="switch-btn">Зарегистрироваться</b>
+            </div>
         </div>
     </div>
 
     <div id="app-screen" class="screen">
         <div class="app-container">
             <nav class="nav-bar">
-                <i class="fas fa-comment active" onclick="tab('chats', this)"></i>
-                <i class="fas fa-search" onclick="tab('search', this)"></i>
-                <i class="fas fa-shield-alt" onclick="tab('privacy', this)"></i>
-                <i class="fas fa-user-circle" onclick="tab('profile', this)"></i>
+                <i class="fas fa-comment active" onclick="showTab('chats', this)"></i>
+                <i class="fas fa-search" onclick="showTab('search', this)"></i>
+                <i class="fas fa-user-circle" onclick="showTab('profile', this)"></i>
             </nav>
-
             <aside class="sidebar">
-                <div id="tab-chats" class="tab-content active"><div class="tab-header">Чаты</div><div style="padding:15px;color:var(--sub)">Список пуст</div></div>
-                <div id="tab-search" class="tab-content"><div class="tab-header">Поиск</div></div>
-                <div id="tab-privacy" class="tab-content"><div class="tab-header">Приватность</div></div>
+                <div id="tab-chats" class="tab-content active">
+                    <div class="header">Чаты</div>
+                    <div style="padding:20px; color:var(--sub)">Список пуст</div>
+                </div>
+                <div id="tab-search" class="tab-content">
+                    <div class="header">Поиск</div>
+                    <div style="padding:20px">
+                        <input type="text" placeholder="Введите @id..." style="background:var(--bg)">
+                    </div>
+                </div>
                 <div id="tab-profile" class="tab-content">
-                    <div class="tab-header">Профиль</div>
-                    <div style="padding:20px;text-align:center;">
-                        <div class="verona-logo" style="margin: 0 auto 20px;"><i class="fas fa-user"></i></div>
-                        <h2 id="profile-nick">User</h2>
-                        <button class="btn-main" onclick="location.reload()" style="background:var(--danger)">Выйти</button>
+                    <div class="header">Мой Профиль</div>
+                    <div style="padding:30px; text-align:center;">
+                        <div class="verona-logo" style="margin:0 auto 20px; background:var(--accent); color:#fff;"><i class="fas fa-user"></i></div>
+                        <h2 id="user-display">Имя</h2>
+                        <button class="btn-main" style="background:#ed4245" onclick="location.reload()">Выйти</button>
                     </div>
                 </div>
             </aside>
-            <main class="chat-view"><div class="chat-header"><b>Чат не выбран</b></div></main>
+            <main style="flex:1; background:var(--bg); display:flex; align-items:center; justify-content:center; color:var(--sub)">
+                Выберите чат
+            </main>
         </div>
     </div>
 
     <script>
         let isLogin = true;
 
-        // Переключатель Регистрация / Вход
-        function switchAuth() {
+        // Переключение между Входом и Регистрацией
+        function toggleAuth() {
             isLogin = !isLogin;
-            const fields = document.getElementById('reg-fields');
-            const title = document.getElementById('auth-title');
-            const btn = document.getElementById('auth-btn');
-            const link = document.getElementById('auth-link');
-
-            if (isLogin) {
-                fields.style.display = 'none';
-                title.innerText = 'Вход';
-                btn.innerText = 'Войти';
-                link.innerText = 'Нет аккаунта? Зарегистрироваться';
-            } else {
-                fields.style.display = 'block';
-                title.innerText = 'Регистрация';
-                btn.innerText = 'Создать аккаунт';
-                link.innerText = 'Уже есть аккаунт? Войти';
-            }
+            document.getElementById('reg-fields').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('auth-title').innerText = isLogin ? 'Вход' : 'Регистрация';
+            document.getElementById('auth-btn').innerText = isLogin ? 'Войти' : 'Создать аккаунт';
+            document.getElementById('switch-text').innerText = isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?';
+            document.getElementById('switch-btn').innerText = isLogin ? 'Зарегистрироваться' : 'Войти';
         }
 
-        // КНОПКА "СТАРТ"
-        function startApp() {
-            const name = document.getElementById('auth-name').value;
-            if(!name) return alert("Введите никнейм!");
+        // ГЛАВНАЯ ФУНКЦИЯ: ПЕРЕХОД В ПРИЛОЖЕНИЕ
+        function handleAuth() {
+            const name = document.getElementById('name-input').value;
+            if(!name) {
+                alert("Пожалуйста, введите никнейм!");
+                return;
+            }
             
-            // Ставим имя в профиль
-            document.getElementById('profile-nick').innerText = name;
+            // Устанавливаем имя в профиле
+            document.getElementById('user-display').innerText = name;
             
-            // Переключаем экраны
+            // Прячем вход, показываем приложение
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('app-screen').classList.add('active');
         }
 
-        // Переключатель вкладок
-        function tab(name, el) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        // Переключение вкладок в приложении
+        function showTab(tabId, icon) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-bar i').forEach(i => i.classList.remove('active'));
-            document.getElementById('tab-' + name).classList.add('active');
-            el.classList.add('active');
-        }
-    </script>
-</body>
-</html>
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            icon.classList.add('active');
         }
     </script>
 </body>
