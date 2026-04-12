@@ -5,323 +5,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VERONAGRAM ULTIMATE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
-        :root {
-            /* ТВОЯ ЦВЕТОВАЯ СХЕМА */
-            --accent: #5865f2; /* Синий Discord/Verona */
-            --bg: #0e1621;    /* Глубокий темный */
-            --panel: #17212b; /* Панели */
-            --text: #fff;     /* Белый текст */
-            --sub: #708499;   /* Субтитры */
-            --msg-in: #182533;/* Входящее */
-            --msg-out: #2b5278;/* Исходящее */
-            --danger: #ed4245;/* Красный */
-            --success: #3ba55c;/* Зеленый */
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; position: relative; }
+        :root { --accent: #5865f2; --bg: #0e1621; --panel: #17212b; --text: #fff; --sub: #708499; --danger: #ed4245; --success: #3ba55c; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* ЭКРАНЫ */
-        .screen { display: none; height: 100vh; width: 100%; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
-        .screen.active { display: flex; opacity: 1; }
+        .screen { display: none; height: 100vh; width: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
 
-        /* --- 1. РЕГИСТРАЦИЯ (ОБНОВЛЕННАЯ) --- */
+        /* РЕГИСТРАЦИЯ */
         #login-screen { justify-content: center; align-items: center; background: radial-gradient(circle at top, #1e2a38, #0e1621); }
-        .auth-card { 
-            width: 90%; max-width: 420px; background: var(--panel); 
-            padding: 50px 30px 40px; border-radius: 28px; text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6); position: relative;
-        }
-        
-        /* КРУТАЯ АВАТАРКА В РЕГИСТРАЦИИ */
-        .avatar-upload {
-            width: 100px; height: 100px; border-radius: 50%; background: var(--bg);
-            margin: -90px auto 20px; display: flex; align-items: center; justify-content: center;
-            border: 4px solid var(--accent); color: var(--accent); font-size: 40px;
-            cursor: pointer; overflow: hidden; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .avatar-upload:hover { transform: scale(1.05); }
-        .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .auth-card { width: 90%; max-width: 400px; background: var(--panel); padding: 50px 30px 40px; border-radius: 28px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
+        .auth-card input, .auth-card textarea { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: none; background: var(--bg); color: #fff; outline: none; }
+        .btn-main { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
 
-        .auth-card h2 { margin-bottom: 25px; font-weight: 800; letter-spacing: 0.5px; color: #fff; }
-        .auth-card input, .auth-card textarea { 
-            width: 100%; padding: 15px; margin: 9px 0; border-radius: 14px;
-            border: 2px solid transparent; background: var(--bg); color: #fff; outline: none; transition: 0.3s;
-        }
-        .auth-card input:focus, .auth-card textarea:focus { border-color: var(--accent); background: rgba(88,101,242,0.05); }
-        .auth-card textarea { resize: none; height: 90px; }
-
-        .btn-main {
-            width: 100%; padding: 16px; border-radius: 14px; border: none;
-            background: var(--accent); color: #fff; font-weight: bold;
-            font-size: 16px; cursor: pointer; margin-top: 25px; transition: 0.2s;
-            box-shadow: 0 5px 15px rgba(88,101,242,0.3);
-        }
-        .btn-main:active { transform: scale(0.97); }
-
-        /* --- 2. ГЛАВНЫЙ ИНТЕРФЕЙС (ПРОФИЛЬ, ЧАТЫ И Т.Д.) --- */
+        /* ОСНОВНОЙ ИНТЕРФЕЙС */
         .app-shell { display: flex; width: 100%; height: 100%; }
-
-        /* Боковое меню (как в Telegram) */
-        .nav-bar { 
-            width: 75px; background: #080e16; display: flex; flex-direction: column; 
-            align-items: center; padding: 25px 0; gap: 35px; border-right: 1px solid rgba(255,255,255,0.03); 
-        }
-        .nav-bar i { font-size: 24px; color: var(--sub); cursor: pointer; transition: 0.2s; position: relative; }
+        .nav-bar { width: 70px; background: #080e16; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; border-right: 1px solid rgba(255,255,255,0.02); }
+        .nav-bar i { font-size: 22px; color: var(--sub); cursor: pointer; transition: 0.2s; }
         .nav-bar i.active { color: var(--accent); }
-        .nav-bar i.active::after { content: ''; position: absolute; right: -25px; top: 0; bottom: 0; width: 3px; background: var(--accent); border-radius: 3px; }
 
-        /* Основной контент (списки) */
-        .sidebar { width: 350px; background: var(--panel); display: flex; flex-direction: column; border-right: 1px solid rgba(0,0,0,0.2); }
-        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; scrollbar-width: none; }
-        .tab-content::-webkit-scrollbar { display: none; }
+        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid rgba(0,0,0,0.2); display: flex; flex-direction: column; }
+        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
         .tab-content.active { display: flex; }
-        
-        .tab-header { padding: 20px 25px; font-size: 22px; font-weight: 800; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;}
-        
-        /* СПИСОК ЧАТОВ */
-        .chat-item { padding: 15px 20px; display: flex; gap: 15px; align-items: center; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
-        .chat-item:hover { background: rgba(255,255,255,0.03); }
-        .avatar-small { width: 50px; height: 50px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; }
-        .avatar-small img { width: 100%; height: 100%; object-fit: cover; }
+        .tab-header { padding: 20px 25px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* ПОИСК */
-        .search-container { padding: 15px 20px; }
-        .search-input { width: 100%; padding: 12px 15px; border-radius: 10px; border: none; background: var(--bg); color: #fff; outline: none; transition: 0.3s; }
-        .search-input:focus { background: #111; }
-        
-        .user-card-res { background: var(--bg); border-radius: 18px; padding: 25px; margin-top: 20px; text-align: center; display: none; border: 1px solid var(--accent); animation: slideUp 0.3s ease; }
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
-        .btn-group button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: bold; color: #fff; transition: 0.2s; }
+        /* ПРОФИЛЬ (КАК НА СКРИНШОТАХ) */
+        .profile-card { background: linear-gradient(135deg, #2b5278, #5865f2); margin: 15px; border-radius: 20px; padding: 30px 20px; text-align: center; }
+        .avatar-big { width: 90px; height: 90px; background: #fff; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--accent); border: 4px solid rgba(255,255,255,0.2); }
+        .info-block { background: var(--bg); margin: 0 15px 10px; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; }
+        .info-block i { color: var(--accent); width: 20px; text-align: center; }
 
-        /* --- 3. СУПЕР-ПРОФИЛЬ (КАК В TG) --- */
-        .profile-container { padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
-        
-        /* Главная шапка профиля */
-        .prof-header-card { 
-            background: linear-gradient(135deg, #1e2a38 0%, #0e1621 100%);
-            border-radius: 20px; padding: 35px 20px; text-align: center; position: relative; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        .prof-header-card::after { content: ''; position: absolute; inset: 0; background: url('https://w.wallhaven.cc/full/8o/wallhaven-8o9mpy.jpg') center; background-size: cover; opacity: 0.1; }
-        
-        .avatar-big { width: 110px; height: 110px; border-radius: 50%; background: #fff; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; color: var(--accent); position: relative; z-index: 1; border: 4px solid var(--accent); overflow: hidden;}
-        .avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+        /* ПОИСК И КОНТАКТЫ */
+        .search-box { padding: 15px; }
+        .user-res-card { background: var(--bg); border-radius: 15px; padding: 20px; margin-top: 15px; text-align: center; border: 1px solid var(--accent); display: none; }
+        .btn-mini { padding: 8px 12px; border-radius: 8px; border: none; color: #fff; font-size: 12px; font-weight: bold; cursor: pointer; margin: 5px; }
 
-        /* Карточки информации (Telegram Style) */
-        .prof-info-block { background: var(--panel); border-radius: 18px; padding: 10px; display: flex; flex-direction: column; gap: 2px; }
-        .info-item { padding: 12px 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
-        .info-item:hover { background: rgba(255,255,255,0.03); }
-        .info-item i { width: 20px; text-align: center; font-size: 18px; color: var(--accent); }
-        
-        /* Окно чата (справа) */
-        .chat-view { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
-        .msgs { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; }
-        .bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; font-size: 15px; position: relative; }
-        .bubble.sent { background: var(--msg-out); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .bubble.received { background: var(--msg-in); align-self: flex-start; border-bottom-left-radius: 4px; }
+        /* ЧАТ */
+        .chat-view { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
+        .msgs { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { max-width: 75%; padding: 12px 16px; border-radius: 16px; font-size: 14px; position: relative; }
+        .bubble.me { align-self: flex-end; background: #2b5278; border-bottom-right-radius: 2px; }
+        .bubble.other { align-self: flex-start; background: #182533; border-bottom-left-radius: 2px; }
 
-        .chat-input { padding: 15px; background: var(--panel); display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.1); }
-        .chat-input input { flex: 1; background: var(--bg); border: none; padding: 13px 20px; border-radius: 25px; color: #fff; outline: none; }
+        .chat-input { padding: 15px; background: var(--panel); display: flex; gap: 10px; border-top: 1px solid rgba(0,0,0,0.1); }
+        .chat-input input { flex: 1; background: var(--bg); border: none; padding: 12px 18px; border-radius: 25px; color: #fff; outline: none; }
 
-        /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 768px) {
             .app-shell { flex-direction: column-reverse; }
-            .nav-bar { width: 100%; height: 65px; position: fixed; bottom: 0; flex-direction: row; justify-content: space-around; padding: 0; border-right: none; border-top: 1px solid rgba(255,255,255,0.05); z-index: 50; }
-            .nav-bar i.active::after { display: none; }
-            .sidebar { width: 100%; flex: 1; padding-bottom: 65px; }
-            .chat-view { position: fixed; inset: 0; transform: translateX(100%); transition: 0.3s; z-index: 100; }
-            .chat-view.active { transform: translateX(0); }
+            .nav-bar { width: 100%; height: 60px; flex-direction: row; justify-content: space-around; padding: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+            .sidebar { width: 100%; height: 100%; }
+            .chat-view { display: none; }
         }
-
-        /* АНИМАЦИИ */
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="screen active">
         <div class="auth-card">
-            <div class="avatar-upload" onclick="document.getElementById('file-in').click()">
-                <i class="fas fa-camera" id="cam-icon"></i>
-                <img id="avatar-prev" src="" style="display:none">
-            </div>
-            <input type="file" id="file-in" hidden onchange="handleImageLoad(this)">
-
-            <h2>Создать профиль</h2>
-            <input type="text" id="reg-name" placeholder="Никнейм (Ник)">
-            <input type="password" id="reg-pass" placeholder="Пароль">
-            <input type="email" id="reg-email" placeholder="Электронная почта">
-            <textarea id="reg-bio" placeholder="Расскажите о себе (статус)..."></textarea>
-            <button class="btn-main" onclick="performRegister()">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+            <h2 style="margin-bottom: 25px;">Veronagram</h2>
+            <input type="text" id="reg-name" placeholder="Никнейм">
+            <input type="email" id="reg-email" placeholder="Почта">
+            <textarea id="reg-bio" placeholder="О себе / Статус"></textarea>
+            <button class="btn-main" onclick="initApp()">ВОЙТИ В ОБЛАКО</button>
         </div>
     </div>
 
     <div id="app-screen" class="screen">
         <div class="app-shell">
             <nav class="nav-bar">
-                <i class="fas fa-comment active" onclick="switchMainTab('chats', this)"></i>
-                <i class="fas fa-search" onclick="switchMainTab('search', this)"></i>
-                <i class="fas fa-user-friends" onclick="switchMainTab('contacts', this)"></i>
-                <i class="fas fa-user-circle" onclick="switchMainTab('profile', this)"></i>
+                <i class="fas fa-comment active" onclick="switchTab('chats', this)"></i>
+                <i class="fas fa-search" onclick="switchTab('search', this)"></i>
+                <i class="fas fa-user-friends" onclick="switchTab('friends', this)"></i>
+                <i class="fas fa-user-circle" onclick="switchTab('profile', this)"></i>
             </nav>
 
             <aside class="sidebar">
-                
                 <div id="tab-chats" class="tab-content active">
                     <div class="tab-header">Чаты</div>
-                    <div id="chats-list-area" style="padding: 20px; color:var(--sub); text-align:center;">
-                        Нет активных чатов. Используйте поиск!
-                    </div>
+                    <div style="padding:20px; color:var(--sub); text-align:center;">Общий чат активен</div>
                 </div>
 
                 <div id="tab-search" class="tab-content">
-                    <div class="tab-header">Поиск друзей</div>
-                    <div class="search-container">
-                        <input type="text" class="search-input" id="search-q" placeholder="Введите @id (например @admin)..." oninput="liveUserSearch()">
-                        
-                        <div id="search-res-card" class="user-card-res">
-                            <div class="avatar-small" style="margin: 0 auto 10px; width:60px; height:60px; font-size:24px; color:#fff;"><i class="fas fa-user-shield"></i></div>
-                            <b id="res-user-name">Admin</b>
-                            <p style="color:var(--sub); font-size:12px; margin-bottom:15px;">@admin</p>
-                            <div class="btn-group">
-                                <button style="background:var(--accent)" onclick="searchAct('Запрос отправлен!')">Добавить</button>
-                                <button style="background:var(--danger)" onclick="searchAct('Пользователь заблокирован!')">Блок</button>
-                                <button style="background:var(--success); flex:2;" onclick="searchAct('Чат создан!')">Написать</button>
+                    <div class="tab-header">Поиск</div>
+                    <div class="search-box">
+                        <input type="text" id="sq" placeholder="Поиск по @id..." style="width:100%; padding:12px; border-radius:10px; background:var(--bg); border:none; color:#fff;" oninput="doSearch()">
+                        <div id="search-res" class="user-res-card">
+                            <div class="avatar-big" style="width:60px; height:60px; font-size:24px;"><i class="fas fa-robot"></i></div>
+                            <b id="res-name">Verona Admin</b>
+                            <p style="color:var(--sub); font-size:12px; margin-bottom:10px;">@admin</p>
+                            <div style="display:flex; justify-content:center;">
+                                <button class="btn-mini" style="background:var(--accent)" onclick="alert('Запрос отправлен!')">Добавить</button>
+                                <button class="btn-mini" style="background:var(--danger)" onclick="alert('Заблокирован')">Блок</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="tab-contacts" class="tab-content">
+                <div id="tab-friends" class="tab-content">
                     <div class="tab-header">Контакты</div>
-                    <div style="padding:15px 20px;">
-                        <div class="chat-item" style="border:none; background:var(--bg); border-radius:12px;">
-                            <div class="avatar-small" style="background:#f1c40f; color:#fff;"><i class="fas fa-star"></i></div>
-                            <div><b>Verona Support</b><br><small>Добавлен</small></div>
-                        </div>
-                        <p style="color:var(--sub); font-size:12px; margin-top:15px;">Список заблокированных (0)</p>
-                    </div>
+                    <div style="padding:20px; color:var(--sub);">Список пуст</div>
                 </div>
 
                 <div id="tab-profile" class="tab-content">
-                    <div class="tab-header">Профиль</div>
-                    
-                    <div class="profile-container">
-                        <div class="prof-header-card">
-                            <div class="avatar-big" id="prof-pic-big"></div>
-                            <h2 id="prof-nick-view" style="position:relative; z-index:1;">Имя</h2>
-                            <p id="prof-id-view" style="color:rgba(255,255,255,0.7); font-size:13px; position:relative; z-index:1;">@user_id_12345</p>
-                        </div>
-
-                        <div class="prof-info-block">
-                            <div class="info-item">
-                                <i class="fas fa-at"></i>
-                                <div><small style="color:var(--sub); display:block;">Никнейм</small><span id="prof-nick-view2">Имя</span></div>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-envelope"></i>
-                                <div><small style="color:var(--sub); display:block;">Электронная почта</small><span id="prof-email-view">не указана</span></div>
-                            </div>
-                        </div>
-
-                        <div class="prof-info-block">
-                            <div class="info-item">
-                                <i class="fas fa-info-circle"></i>
-                                <div><small style="color:var(--sub); display:block;">О себе</small><span id="prof-bio-view">Привет, я в Veronagram!</span></div>
-                            </div>
-                        </div>
-
-                        <button class="btn-main" style="background:#2b5278; margin-top:15px; background-image:linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1));">
-                            <i class="fas fa-cog"></i> Настройки мессенджера
-                        </button>
-                        <button class="btn-main" style="background:var(--danger); margin-top:10px; margin-bottom:30px;" onclick="location.reload()">
-                            <i class="fas fa-sign-out-alt"></i> Выйти из аккаунта
-                        </button>
+                    <div class="tab-header">Мой Профиль</div>
+                    <div class="profile-card">
+                        <div class="avatar-big"><i class="fas fa-user"></i></div>
+                        <h2 id="p-name">Имя</h2>
+                        <p style="opacity:0.7; font-size:13px;">@user_id_new</p>
                     </div>
+                    <div class="info-block"><i class="fas fa-envelope"></i><div><small style="color:var(--sub); display:block;">Почта</small><span id="p-email">---</span></div></div>
+                    <div class="info-block"><i class="fas fa-info-circle"></i><div><small style="color:var(--sub); display:block;">О себе</small><span id="p-bio">---</span></div></div>
+                    <div style="padding:15px;"><button class="btn-main" style="background:var(--danger); margin:0;" onclick="location.reload()">ВЫЙТИ</button></div>
                 </div>
             </aside>
-
-            <main class="chat-view" id="main-chat">
-                <div class="msgs">
-                    <p style="text-align:center; color:var(--sub); margin-top:50px;">Выберите чат, чтобы начать общение</p>
-                </div>
+            
+            <main class="chat-view">
+                <div class="tab-header" id="chat-title">Общий чат</div>
+                <div class="msgs" id="msg-box"></div>
                 <div class="chat-input">
-                    <input type="text" placeholder="Сообщение..." disabled>
-                    <i class="fas fa-paper-plane" style="color:var(--sub); cursor:pointer"></i>
+                    <input type="text" id="m-in" placeholder="Сообщение...">
+                    <button class="btn-main" style="margin:0; width:auto; padding:0 20px;" onclick="send()">Отправить</button>
                 </div>
             </main>
         </div>
     </div>
 
     <script>
-        let myData = {};
+        // ТВОИ КЛЮЧИ СЮДА
+        const firebaseConfig = {
+            apiKey: "ВСТАВЬ_СВОЙ",
+            authDomain: "ПРОЕКТ.firebaseapp.com",
+            databaseURL: "https://ПРОЕКТ.firebaseio.com",
+            projectId: "ПРОЕКТ",
+            storageBucket: "ПРОЕКТ.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
+        };
 
-        // Загрузка аватарки в регистрации
-        function handleImageLoad(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    document.getElementById('avatar-prev').src = e.target.result;
-                    document.getElementById('avatar-prev').style.display = 'block';
-                    document.getElementById('cam-icon').style.display = 'none';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let myNick = "";
 
-        // КНОПКА ЗАРЕГИСТРИРОВАТЬСЯ
-        function performRegister() {
-            myData.name = document.getElementById('reg-name').value;
-            myData.pass = document.getElementById('reg-pass').value; // ПАРОЛЬ ПРИНЯТ
-            myData.email = document.getElementById('reg-email').value;
-            myData.bio = document.getElementById('reg-bio').value;
-            myData.img = document.getElementById('avatar-prev').src;
-
-            if(!myData.name || !myData.pass) {
-                alert("Обязательно введите Никнейм и Пароль!");
-                return;
-            }
-
-            // ОБНОВЛЯЕМ ДАННЫЕ В СУПЕР-ПРОФИЛЕ
-            document.getElementById('prof-nick-view').innerText = myData.name;
-            document.getElementById('prof-nick-view2').innerText = myData.name;
-            if(myData.email) document.getElementById('prof-email-view').innerText = myData.email;
-            if(myData.bio) document.getElementById('prof-bio-view').innerText = myData.bio;
+        function initApp() {
+            myNick = document.getElementById('reg-name').value;
+            if(!myNick) return alert("Никнейм!");
             
-            if(myData.img) {
-                document.getElementById('prof-pic-big').innerHTML = `<img src="${myData.img}">`;
-            } else {
-                document.getElementById('prof-pic-big').innerHTML = `<i class="fas fa-user"></i>`;
-            }
+            document.getElementById('p-name').innerText = myNick;
+            document.getElementById('p-email').innerText = document.getElementById('reg-email').value || 'не указана';
+            document.getElementById('p-bio').innerText = document.getElementById('reg-bio').value || 'В сети';
 
-            // ПЕРЕХОД В ПРИЛОЖЕНИЕ
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('app-screen').classList.add('active');
-        }
-
-        // Переключение вкладок (chats, search, profile и т.д.)
-        function switchMainTab(tabName, iconElement) {
-            // Прячем все вкладки
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            // Делаем все иконки неактивными
-            document.querySelectorAll('.nav-bar i').forEach(icon => icon.classList.remove('active'));
             
-            // Показываем нужную вкладку и делаем иконку активной
-            document.getElementById('tab-' + tabName).classList.add('active');
-            iconElement.classList.add('active');
+            // Загрузка сообщений
+            db.ref("messages").on("value", (s) => {
+                const box = document.getElementById('msg-box');
+                box.innerHTML = "";
+                const data = s.val();
+                for(let id in data) {
+                    const m = data[id];
+                    const d = document.createElement('div');
+                    d.className = m.user === myNick ? "bubble me" : "bubble other";
+                    d.innerHTML = `<b>${m.user}</b><br>${m.text}`;
+                    box.appendChild(d);
+                }
+                box.scrollTop = box.scrollHeight;
+            });
         }
 
-        // Живой поиск
-        function liveUserSearch() {
-            const query = document.getElementById('search-q').value.toLowerCase();
-            const resultCard = document.getElementById('search-res-card');
-            
-            // Если ввели @admin, показываем фейкового админа
-            resultCard.style.display = (query === '@admin' || query === 'admin') ? 'block' : 'none';
+        function send() {
+            const t = document.getElementById('m-in').value;
+            if(!t) return;
+            db.ref("messages").push().set({ user: myNick, text: t });
+            document.getElementById('m-in').value = "";
         }
 
-        function searchAct(text) { alert(text); }
+        function doSearch() {
+            const q = document.getElementById('sq').value.toLowerCase();
+            document.getElementById('search-res').style.display = (q === 'admin' || q === '@admin') ? 'block' : 'none';
+        }
+
+        function switchTab(t, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-bar i').forEach(i => i.classList.remove('active'));
+            document.getElementById('tab-' + t).classList.add('active');
+            el.classList.add('active');
+        }
     </script>
 </body>
 </html>
