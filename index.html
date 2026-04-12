@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VERONA ELITE V7</title>
+    <title>VERONA ELITE V8</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -21,13 +21,12 @@
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .auth-card { background: #0a0e14; padding: 35px; border-radius: 30px; border: 1px solid var(--accent); width: 90%; max-width: 360px; text-align: center; box-shadow: var(--neon); }
         .auth-input { background: #000; border: 1px solid #222; padding: 14px; border-radius: 12px; color: #fff; width: 100%; margin-bottom: 12px; outline: none; text-align: center; }
-        .auth-btn { background: var(--accent); color: #000; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .auth-btn { background: var(--accent); color: #000; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; }
 
-        /* NAV & SIDEBAR (PC) */
+        /* NAV & SIDEBAR */
         .nav-bar { width: 80px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 40px; border-right: 1px solid #1a1a1a; }
         .nav-bar i { font-size: 24px; color: #444; cursor: pointer; transition: 0.3s; }
         .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
-
         .sidebar { width: 380px; background: var(--panel); display: flex; flex-direction: column; border-right: 2px solid #000; }
         .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 20px; }
         .tab-content.active { display: flex; }
@@ -39,45 +38,37 @@
         .msg-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
 
         /* MESSAGES */
-        .msg { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; position: relative; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
         .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: 500; border-bottom-right-radius: 4px; }
         .msg.other { align-self: flex-start; background: #1c2128; border-bottom-left-radius: 4px; }
-        .reply-in-msg { font-size: 12px; opacity: 0.7; border-left: 2px solid #fff; padding-left: 6px; margin-bottom: 6px; display: block; }
-        .like-tag { position: absolute; bottom: -10px; right: 10px; background: #000; border: 1px solid var(--accent); border-radius: 10px; padding: 2px 6px; font-size: 12px; }
+        .reply-in-msg { font-size: 11px; opacity: 0.6; display: block; border-left: 2px solid currentColor; padding-left: 5px; margin-bottom: 4px; }
+        .like-tag { position: absolute; bottom: -8px; right: 8px; background: #000; border: 1px solid var(--accent); border-radius: 10px; padding: 1px 5px; font-size: 11px; }
 
         /* INPUT AREA */
         .input-wrap { background: #0d1117; border-top: 1px solid #1a202a; display: flex; flex-direction: column; }
-        .reply-preview { padding: 10px 15px; background: #161b22; display: none; align-items: center; justify-content: space-between; border-left: 4px solid var(--accent); }
-        .input-area { padding: 12px 15px; display: flex; align-items: center; gap: 12px; }
-        .input-area input { flex: 1; background: #000; border: 1px solid #333; padding: 12px 18px; border-radius: 25px; color: #fff; outline: none; font-size: 16px; }
+        .input-area { padding: 12px 15px; display: flex; align-items: center; gap: 12px; min-height: 60px; }
+        .input-area input { flex: 1; background: #000; border: 1px solid #333; padding: 12px 18px; border-radius: 25px; color: #fff; outline: none; }
         
-        /* VOICE UI & EMOJI */
-        #voice-info { display: none; align-items: center; gap: 10px; color: var(--accent); font-weight: bold; flex: 1; }
-        .rec-dot { width: 10px; height: 10px; background: #ff0055; border-radius: 50%; animation: pulse 1s infinite; box-shadow: 0 0 10px #ff0055; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        #voice-info { display: none; align-items: center; gap: 12px; color: var(--accent); font-weight: bold; flex: 1; }
+        .rec-dot { width: 10px; height: 10px; background: #ff0055; border-radius: 50%; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         
         #emoji-panel { display: none; height: 180px; overflow-y: auto; background: #000; grid-template-columns: repeat(8, 1fr); padding: 10px; border-top: 1px solid #222; }
-        .emoji-btn { font-size: 24px; padding: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .emoji-btn:active { transform: scale(1.3); }
+        .emoji-btn { font-size: 22px; padding: 8px; text-align: center; cursor: pointer; }
 
-        /* PROFILE STYLE (RESTORED) */
-        .prof-header { padding: 40px 20px; text-align: center; }
-        .prof-ava { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; box-shadow: var(--neon); }
-        .posts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; }
-        .post-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid #1a1a1a; }
+        /* PROFILE */
+        .prof-header { padding: 30px 20px; text-align: center; }
+        .prof-ava { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; box-shadow: var(--neon); }
+        .posts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; padding: 10px; }
+        .post-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; }
 
-        /* MOBILE OPTIMIZATION */
+        /* MOBILE */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .nav-bar { 
-                width: 100%; height: 75px; flex-direction: row; justify-content: space-around; 
-                position: fixed; bottom: 0; padding: 0; z-index: 9000; 
-                background: #000; border-top: 2px solid #111; padding-bottom: env(safe-area-inset-bottom);
-            }
-            .nav-bar i { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+            .nav-bar { width: 100%; height: 75px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; background: #000; border-top: 1px solid #111; z-index: 9000; padding-bottom: env(safe-area-inset-bottom); }
             .sidebar { width: 100%; height: 100vh; }
             .tab-content { padding-bottom: 90px; }
-            .chat-main { position: fixed; inset: 0; padding-bottom: 0; z-index: 9500; }
+            .chat-main { position: fixed; inset: 0; z-index: 9500; }
             .input-wrap { padding-bottom: env(safe-area-inset-bottom); }
         }
     </style>
@@ -89,7 +80,7 @@
         <h2 style="color:var(--accent); letter-spacing: 5px;">VERONA</h2><br>
         <input type="text" id="auth-nick" class="auth-input" placeholder="НИКНЕЙМ">
         <input type="password" id="auth-pass" class="auth-input" placeholder="ПАРОЛЬ">
-        <button class="auth-btn" onclick="handleAuth()">ВХОД В СИСТЕМУ</button>
+        <button class="auth-btn" onclick="handleAuth()">ВХОД</button>
     </div>
 </div>
 
@@ -102,26 +93,26 @@
 
 <aside class="sidebar">
     <div id="t-chats" class="tab-content active">
-        <h2 style="padding:25px 20px 10px; color:var(--accent)">MESSAGES</h2>
+        <h2 style="padding:20px; color:var(--accent)">ЧАТЫ</h2>
         <div id="chat-list"></div>
     </div>
     <div id="t-friends" class="tab-content">
-        <h2 style="padding:25px 20px 10px;">FRIENDS</h2>
-        <div style="padding:0 20px 10px"><input type="text" placeholder="Поиск душ..." oninput="searchUsers(this.value)" style="width:100%; background:#000; border:1px solid var(--accent); padding:12px; color:#fff; border-radius:12px"></div>
+        <h2 style="padding:20px;">ПОИСК</h2>
+        <div style="padding:0 20px 15px"><input type="text" id="user-search" placeholder="Кого ищем?..." oninput="searchUsers(this.value)" style="width:100%; background:#000; border:1px solid var(--accent); padding:12px; color:#fff; border-radius:12px; outline:none"></div>
         <div id="friends-list"></div>
     </div>
     <div id="t-themes" class="tab-content">
-        <h2 style="padding:25px 20px 10px;">THEMES</h2>
-        <div id="theme-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:20px"></div>
+        <h2 style="padding:20px;">ТЕМЫ</h2>
+        <div id="theme-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px"></div>
     </div>
     <div id="t-prof" class="tab-content">
         <div class="prof-header">
             <img id="m-ava" src="" class="prof-ava">
-            <h2 id="m-name" style="margin-top:15px;"></h2>
-            <input type="text" id="m-status" onblur="saveStatus()" style="background:none; border:none; border-bottom:1px solid var(--accent); color:#aaa; text-align:center; width:80%; margin:15px 0;">
-            <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-                <label style="background:var(--gradient); padding:12px 20px; border-radius:12px; color:#000; font-weight:bold; cursor:pointer">ПОСТ <input type="file" hidden onchange="upFile(this,'post')"></label>
-                <label style="background:#1c2128; padding:12px 20px; border-radius:12px; cursor:pointer; border:1px solid var(--accent)">АВА <input type="file" hidden onchange="upFile(this,'ava')"></label>
+            <h2 id="m-name" style="margin-top:10px"></h2>
+            <input type="text" id="m-status" onblur="saveStatus()" style="background:none; border:none; border-bottom:1px solid var(--accent); color:#888; text-align:center; width:80%; margin:15px 0;">
+            <div style="display:flex; gap:10px; justify-content:center">
+                <label style="background:var(--gradient); padding:10px 15px; border-radius:10px; color:#000; font-weight:bold; cursor:pointer">ПОСТ <input type="file" hidden onchange="upFile(this,'post')"></label>
+                <label style="background:#111; border:1px solid var(--accent); padding:10px 15px; border-radius:10px; cursor:pointer">АВА <input type="file" hidden onchange="upFile(this,'ava')"></label>
             </div>
         </div>
         <div id="my-posts" class="posts-grid"></div>
@@ -133,25 +124,25 @@
         <i class="fas fa-chevron-left" onclick="closeChat()"></i>
         <img id="c-ava" src="" style="width:40px; height:40px; border-radius:50%; border:1px solid var(--accent)">
         <b id="c-name">Чат</b>
-        <i class="fas fa-trash-alt" onclick="clearChat()" style="margin-left:auto; opacity:0.4; padding:5px"></i>
+        <i class="fas fa-trash-alt" onclick="clearChat()" style="margin-left:auto; opacity:0.3"></i>
     </div>
     <div class="msg-box" id="messages"></div>
 
     <div class="input-wrap">
-        <div id="reply-preview" class="reply-preview">
-            <span id="reply-text" style="font-size:13px; opacity:0.8">Ответ...</span>
+        <div id="reply-preview" style="display:none; padding:8px 15px; background:#161b22; border-left:4px solid var(--accent); justify-content:space-between; align-items:center">
+            <span id="reply-text" style="font-size:12px; opacity:0.7"></span>
             <i class="fas fa-times" onclick="cancelReply()"></i>
         </div>
         <div id="emoji-panel"></div>
         <div class="input-area">
             <div id="voice-info">
                 <div class="rec-dot"></div> <span id="rec-timer">0:00</span>
-                <i class="fas fa-times" onclick="stopRec(false)" style="color:#ff0055; margin-left:15px; font-size:20px"></i>
+                <i class="fas fa-times" onclick="stopRec(false)" style="color:#ff0055; margin-left:15px; font-size:22px; cursor:pointer"></i>
             </div>
-            <i class="fas fa-microphone" id="mic-btn" onclick="startRec()" style="color:var(--accent); font-size:22px;"></i>
+            <i class="fas fa-microphone" id="mic-btn" onclick="toggleRec()" style="color:var(--accent); font-size:22px; cursor:pointer"></i>
             <i class="far fa-smile" onclick="toggleEmoji()" style="color:var(--accent); font-size:22px; cursor:pointer"></i>
-            <input type="text" id="msg-in" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') send()">
-            <i class="fas fa-paper-plane" onclick="send()" style="color:var(--accent); font-size:22px;"></i>
+            <input type="text" id="msg-in" placeholder="Напиши что-нибудь..." onkeypress="if(event.key==='Enter') send()">
+            <i class="fas fa-paper-plane" onclick="send()" style="color:var(--accent); font-size:22px; cursor:pointer"></i>
         </div>
     </div>
 </main>
@@ -162,24 +153,24 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let me = JSON.parse(localStorage.getItem('v7-user')), currentChat, chatFriend, replyMsg = null;
+    let me = JSON.parse(localStorage.getItem('v8-user')), currentChat, chatFriend, replyMsg = null;
     let recorder, chunks = [], recInt, sec = 0;
 
     if(me) loginOk(me);
 
     async function handleAuth() {
         const n = document.getElementById('auth-nick').value.toLowerCase().trim();
-        const p = document.getElementById('auth-pass').value;
+        const p = document.getElementById('auth-pass').value.trim();
         if(!n || !p) return;
         const s = await db.ref('users/'+n).once('value');
-        if(s.exists() && s.val().pass !== p) return alert("Пароль неверный");
-        const u = s.exists() ? s.val() : { nick:n, pass:p, name:n, ava:"", status:"Verona Soul", posts:[] };
+        if(s.exists() && s.val().pass !== p) return alert("Неверный пароль");
+        const u = s.exists() ? s.val() : { nick:n, pass:p, name:n, ava:"", status:"Verona User", posts:[] };
         if(!s.exists()) await db.ref('users/'+n).set(u);
         loginOk(u);
     }
 
     function loginOk(u) {
-        me = u; localStorage.setItem('v7-user', JSON.stringify(me));
+        me = u; localStorage.setItem('v8-user', JSON.stringify(me));
         document.getElementById('auth-screen').style.display = 'none';
         db.ref('users/'+me.nick).on('value', s => {
             const d = s.val(); if(!d) return;
@@ -194,9 +185,32 @@
     function initEmoji() {
         const p = document.getElementById('emoji-panel');
         const list = "😀,😂,😊,😍,🥰,😎,😏,😒,😔,😢,😭,😱,🔥,✨,💎,👑,🖤,❤️,👍,🙌,👏,🤙,🔞,💸,🔫,💣,🩸,💀,👽,👾,🤖,👻,🤡,💩,🌪️,🌊,🌈,⚡️,🌩️,🌑,🌟,🍎,🍔,🍕,🍺,🎸,🎮,📱";
-        list.split(',').forEach(e => {
-            p.innerHTML += `<div class="emoji-btn" onclick="document.getElementById('msg-in').value += '${e}'">${e}</div>`;
+        list.split(',').forEach(e => { p.innerHTML += `<div class="emoji-btn" onclick="document.getElementById('msg-in').value += '${e}'">${e}</div>`; });
+    }
+
+    function searchUsers(q) {
+        const list = document.getElementById('friends-list');
+        if(!q) { list.innerHTML = ""; return; }
+        db.ref('users').orderByKey().startAt(q.toLowerCase()).endAt(q.toLowerCase() + '\uf8ff').once('value', s => {
+            let h = "";
+            s.forEach(u => {
+                const d = u.val();
+                if(u.key !== me.nick) {
+                    h += `<div class="user-item" style="display:flex; align-items:center; padding:15px; gap:12px; cursor:pointer; border-bottom:1px solid #111" onclick="addFriend('${u.key}','${d.name}','${d.ava}')">
+                        <img src="${d.ava || 'https://via.placeholder.com/50'}" style="width:45px; height:45px; border-radius:50%; border:1px solid var(--accent)">
+                        <b>${d.name}</b>
+                    </div>`;
+                }
+            });
+            list.innerHTML = h || "<p style='padding:20px; opacity:0.5'>Никто не найден...</p>";
         });
+    }
+
+    async function addFriend(nick, name, ava) {
+        await db.ref(`friends/${me.nick}/${nick}`).set({name, ava});
+        tab('chats'); openChat(nick, name, ava);
+        document.getElementById('user-search').value = "";
+        document.getElementById('friends-list').innerHTML = "";
     }
 
     function openChat(nick, name, ava) {
@@ -212,7 +226,7 @@
                 d.className = `msg ${msg.s === me.nick ? 'me' : 'other'}`;
                 let h = "";
                 if(msg.reply) h += `<small class="reply-in-msg">⤴ ${msg.reply}</small>`;
-                if(msg.type === 'voice') h += `<audio src="${msg.t}" controls style="height:30px; width:160px; filter:invert(1)"></audio>`;
+                if(msg.type === 'voice') h += `<audio src="${msg.t}" controls style="height:32px; width:170px; filter:invert(1)"></audio>`;
                 else h += msg.t;
                 if(msg.liked) h += `<span class="like-tag">❤️</span>`;
                 d.innerHTML = h;
@@ -225,44 +239,51 @@
         });
     }
 
-    /* VOICE REC LOGIC */
+    /* VOICE LOGIC FIXED */
     async function startRec() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recorder = new MediaRecorder(stream);
-        chunks = [];
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
-            if(sec > 0) {
-                const blob = new Blob(chunks, { type: 'audio/webm' });
-                const r = new FileReader(); r.readAsDataURL(blob);
-                r.onloadend = () => send(r.result, 'voice');
-            }
-        };
-        recorder.start();
-        document.getElementById('mic-btn').style.display = 'none';
-        document.getElementById('msg-in').style.display = 'none';
-        document.getElementById('voice-info').style.display = 'flex';
-        sec = 0;
-        recInt = setInterval(() => {
-            sec++;
-            let m = Math.floor(sec/60), s = sec%60;
-            document.getElementById('rec-timer').innerText = `${m}:${s<10?'0':''}${s}`;
-        }, 1000);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            recorder = new MediaRecorder(stream);
+            chunks = [];
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                if(sec > 0) {
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    const r = new FileReader(); r.readAsDataURL(blob);
+                    r.onloadend = () => send(r.result, 'voice');
+                }
+                resetUI();
+            };
+            recorder.start();
+            document.getElementById('mic-btn').style.color = '#ff0055';
+            document.getElementById('msg-in').style.display = 'none';
+            document.getElementById('voice-info').style.display = 'flex';
+            sec = 0;
+            recInt = setInterval(() => {
+                sec++;
+                let m = Math.floor(sec/60), s = sec%60;
+                document.getElementById('rec-timer').innerText = `${m}:${s<10?'0':''}${s}`;
+            }, 1000);
+        } catch(e) { alert("Нет доступа к микрофону"); }
     }
 
-    function stopRec(save = true) {
-        clearInterval(recInt);
-        if(!save) sec = 0;
-        recorder.stop();
-        document.getElementById('mic-btn').style.display = 'block';
-        document.getElementById('msg-in').style.display = 'block';
-        document.getElementById('voice-info').style.display = 'none';
-    }
-
-    document.getElementById('mic-btn').addEventListener('click', () => {
+    function toggleRec() {
         if(!recorder || recorder.state === 'inactive') startRec();
         else stopRec(true);
-    });
+    }
+
+    function stopRec(save) {
+        if(!save) sec = 0; 
+        if(recorder && recorder.state !== 'inactive') recorder.stop();
+        clearInterval(recInt);
+    }
+
+    function resetUI() {
+        document.getElementById('mic-btn').style.color = 'var(--accent)';
+        document.getElementById('msg-in').style.display = 'block';
+        document.getElementById('voice-info').style.display = 'none';
+        document.getElementById('rec-timer').innerText = "0:00";
+    }
 
     function send(t = null, type = 'text') {
         const txt = t || document.getElementById('msg-in').value.trim();
@@ -276,22 +297,20 @@
 
     function setReply(t, id) {
         replyMsg = { t, id };
-        document.getElementById('reply-text').innerText = "Ответ на: " + t.substring(0,25) + "...";
+        document.getElementById('reply-text').innerText = "Ответ: " + t.substring(0,25);
         document.getElementById('reply-preview').style.display = 'flex';
     }
     function cancelReply() { replyMsg = null; document.getElementById('reply-preview').style.display = 'none'; }
     function toggleEmoji() { const p = document.getElementById('emoji-panel'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
     
     function loadChatList() {
-        db.ref('users').on('value', s => {
+        db.ref(`friends/${me.nick}`).on('value', s => {
             const l = document.getElementById('chat-list'); l.innerHTML = "";
-            s.forEach(u => {
-                if(u.key !== me.nick) {
-                    const d = u.val();
-                    l.innerHTML += `<div class="user-item" style="display:flex; align-items:center; padding:15px; gap:12px; cursor:pointer" onclick="openChat('${u.key}','${d.name}','${d.ava}')">
-                        <img src="${d.ava || 'https://via.placeholder.com/50'}" style="width:50px; height:50px; border-radius:50%; border:1px solid var(--accent)"> <b>${d.name}</b>
-                    </div>`;
-                }
+            s.forEach(f => {
+                const d = f.val();
+                l.innerHTML += `<div class="user-item" style="display:flex; align-items:center; padding:15px; gap:12px; cursor:pointer" onclick="openChat('${f.key}','${d.name}','${d.ava}')">
+                    <img src="${d.ava || 'https://via.placeholder.com/50'}" style="width:50px; height:50px; border-radius:50%; border:1px solid var(--accent)"> <b>${d.name}</b>
+                </div>`;
             });
         });
     }
@@ -324,7 +343,8 @@
     function setTheme(p, s) { document.documentElement.style.setProperty('--accent', p); document.documentElement.style.setProperty('--gradient', `linear-gradient(45deg, ${p}, ${s})`); }
     function tab(t) { document.querySelectorAll('.tab-content, .nav-bar i').forEach(el => el.classList.remove('active')); document.getElementById('t-'+t).classList.add('active'); document.getElementById('n-'+t).classList.add('active'); }
     function closeChat() { document.getElementById('chat-window').classList.remove('active'); }
-    function clearChat() { if(confirm("Очистить?")) db.ref('messages/'+currentChat).remove(); }
+    function clearChat() { if(confirm("Очистить историю?")) db.ref('messages/'+currentChat).remove(); }
+    function saveStatus() { db.ref('users/'+me.nick).update({status: document.getElementById('m-status').value}); }
 </script>
 </body>
 </html>
