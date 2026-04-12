@@ -1,0 +1,211 @@
+:root {
+    --tg-blue: #2481cc;
+}
+
+.dark-theme {
+    --bg: #0e1621; --panel: #17212b; --text: #fff; --sub: #708499; --chat-bg: #0e1621; --bubble-in: #182533; --bubble-out: #2b5278;
+}
+
+.light-theme {
+    --bg: #fff; --panel: #fff; --text: #000; --sub: #707579; --chat-bg: #dbddbb; --bubble-in: #fff; --bubble-out: #effdde;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
+
+/* Заставка */
+#splash-screen {
+    position: fixed; inset: 0; background: #0e1621; z-index: 9999;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.5s;
+}
+.crow-logo { font-size: 80px; color: #fff; animation: float 3s infinite ease-in-out; }
+.splash-title { letter-spacing: 3px; font-weight: 300; margin-top: 15px; color: #fff; }
+
+/* Авторизация (Новый дизайн) */
+.auth-page { display: flex; justify-content: center; align-items: center; }
+.auth-card { background: var(--panel); padding: 50px 40px; border-radius: 20px; width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.brand-icon { font-size: 50px; color: var(--tg-blue); margin-bottom: 10px; }
+.safety-text { font-size: 13px; color: var(--sub); min-height: 20px; font-style: italic; }
+
+.input-wrapper { position: relative; margin: 30px 0; }
+.clean-input { width: 100%; padding: 10px 0; background: transparent; border: none; border-bottom: 2px solid rgba(120,120,120,0.2); color: var(--text); font-size: 16px; outline: none; }
+.input-line { position: absolute; bottom: 0; left: 50%; width: 0; height: 2px; background: var(--tg-blue); transition: 0.4s; }
+.clean-input:focus + .input-line { width: 100%; left: 0; box-shadow: 0 5px 15px rgba(36, 129, 204, 0.4); }
+
+.tg-btn-main { width: 100%; padding: 14px; background: var(--tg-blue); border: none; color: #fff; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.tg-btn-main:hover { opacity: 0.9; transform: translateY(-2px); }
+
+/* Мессенджер */
+.main-wrapper { display: flex; height: 100vh; position: relative; }
+.chats-sidebar { width: 350px; background: var(--panel); border-right: 1px solid rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+.sidebar-header { padding: 15px; display: flex; align-items: center; gap: 15px; }
+.search-bar { flex: 1; padding: 8px 15px; border-radius: 20px; border: none; background: var(--bg); color: var(--text); }
+
+.chat-card { display: flex; padding: 12px; gap: 12px; cursor: pointer; }
+.chat-card.active { background: var(--tg-blue); color: #fff; }
+.chat-pic { width: 50px; height: 50px; border-radius: 50%; background: #2b5278; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; }
+
+.chat-area { flex: 1; display: flex; flex-direction: column; background: var(--chat-bg); }
+.chat-top-bar { padding: 15px 25px; background: var(--panel); border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: bold; }
+.messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.bubble { padding: 8px 15px; border-radius: 12px; max-width: 70%; }
+.sent { background: var(--bubble-out); align-self: flex-end; border-bottom-right-radius: 2px; }
+.received { background: var(--bubble-in); align-self: flex-start; border-bottom-left-radius: 2px; }
+
+.input-row { padding: 15px 25px; background: var(--panel); display: flex; gap: 15px; }
+.input-row input { flex: 1; border: none; background: transparent; color: var(--text); outline: none; }
+.input-row button { background: none; border: none; color: var(--tg-blue); font-size: 22px; cursor: pointer; }
+
+/* Меню и Конфиденциальность */
+.tg-side-menu { position: absolute; left: -300px; width: 280px; height: 100%; background: var(--panel); z-index: 1000; transition: 0.3s; }
+.tg-side-menu.open { left: 0; box-shadow: 10px 0 50px rgba(0,0,0,0.5); }
+.menu-banner { padding: 30px 20px; background: var(--tg-blue); color: #fff; }
+.user-pic { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 10px; }
+.menu-items li { padding: 15px 20px; display: flex; align-items: center; gap: 20px; cursor: pointer; }
+
+.privacy-overlay { position: absolute; inset: 0; background: var(--bg); z-index: 1100; transform: translateX(100%); transition: 0.3s; }
+.privacy-overlay.visible { transform: translateX(0); }
+.privacy-header { padding: 15px 25px; background: var(--panel); display: flex; align-items: center; gap: 30px; font-size: 18px; }
+.settings-box { background: var(--panel); border-radius: 12px; margin: 20px; overflow: hidden; }
+.s-item { padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(120,120,120,0.1); }
+.blue { color: var(--tg-blue); }
+
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.tg-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(30,30,40,0.9); color: #fff; padding: 10px 20px; border-radius: 20px; opacity: 0; transition: 0.5s; }/* Стили страницы профиля */
+.profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 50px;
+    background: var(--bg);
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 450px;
+    background: var(--panel);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.profile-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.back-btn, .header-actions i {
+    background: none;
+    border: none;
+    color: var(--sub);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.profile-main {
+    text-align: center;
+    padding-bottom: 30px;
+    border-bottom: 8px solid rgba(0,0,0,0.1);
+}
+
+.profile-avatar-big {
+    width: 120px;
+    height: 120px;
+    background: var(--tg-blue);
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: #fff;
+    position: relative;
+    box-shadow: 0 5px 20px rgba(36, 129, 204, 0.4);
+}
+
+.online-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background: #2ecc71;
+    border: 3px solid var(--panel);
+    border-radius: 50%;
+}
+
+.profile-name {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.profile-status {
+    color: var(--tg-blue);
+    font-size: 14px;
+}
+
+.profile-info-list, .profile-actions {
+    padding: 10px 0;
+}
+
+.info-item, .action-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    gap: 25px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.info-item:hover, .action-row:hover {
+    background: rgba(120, 120, 120, 0.05);
+}
+
+.info-item i, .action-row i {
+    width: 20px;
+    color: var(--tg-blue);
+    font-size: 20px;
+}
+
+.info-content b {
+    display: block;
+    font-size: 16px;
+}
+
+.info-content span {
+    font-size: 13px;
+    color: var(--sub);
+}
+
+.tg-toggle {
+    width: 40px;
+    height: 20px;
+    background: var(--sub);
+    border-radius: 20px;
+    margin-left: auto;
+    position: relative;
+}
+
+.tg-toggle.checked {
+    background: var(--tg-blue);
+}
+
+.tg-toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: 0.3s;
+}
+
+.tg-toggle.checked::after {
+    left: 22px;
+}

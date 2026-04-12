@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - VERONAGRAM</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="dark-theme profile-page">
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <button class="back-btn" onclick="location.href='chats.html'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="header-actions">
+                <i class="fas fa-edit" onclick="showToast('Редактирование временно недоступно')"></i>
+                <i class="fas fa-ellipsis-v"></i>
+            </div>
+        </div>
+
+        <div class="profile-main">
+            <div class="profile-avatar-big">
+                <i class="fas fa-crow"></i>
+                <div class="online-badge"></div>
+            </div>
+            <h1 class="profile-name">Verona User</h1>
+            <p class="profile-status">в сети</p>
+        </div>
+
+        <div class="profile-info-list">
+            <div class="info-item">
+                <i class="fas fa-phone"></i>
+                <div class="info-content">
+                    <b>+7 999 123 45 67</b>
+                    <span>Номер телефона</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-at"></i>
+                <div class="info-content">
+                    <b>@verona_id</b>
+                    <span>Имя пользователя</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-info-circle"></i>
+                <div class="info-content">
+                    <b>Твоя безопасность общения у нас!</b>
+                    <span>О себе</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <div class="action-row" onclick="showToast('Уведомления включены')">
+                <i class="fas fa-bell"></i>
+                <span>Уведомления</span>
+                <div class="tg-toggle checked"></div>
+            </div>
+            <div class="action-row" onclick="location.href='index.html'">
+                <i class="fas fa-sign-out-alt" style="color: #e74c3c;"></i>
+                <span style="color: #e74c3c;">Выйти из аккаунта</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        function showToast(text) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'tg-toast';
+            toast.innerText = text;
+            container.appendChild(toast);
+            setTimeout(() => toast.style.opacity = '1', 50);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
