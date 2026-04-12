@@ -3,138 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VERONAGRAM ULTIMATE</title>
+    <title>VERONAGRAM NEON</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
-            --accent: #5865f2; --bg: #0e1621; --panel: #17212b; --text: #fff; --sub: #708499;
-            --grad: linear-gradient(135deg, #2b5278, var(--accent));
+            --accent: #00f2fe; --bg: #0a0b10; --panel: #161b22; --text: #fff; --sub: #8b949e;
+            --neon: 0 0 10px var(--accent), 0 0 20px rgba(0, 242, 254, 0.3);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        .screen { display: none; height: 100vh; width: 100%; flex-direction: column; }
+        .screen { display: none; height: 100vh; width: 100%; }
         .screen.active { display: flex; }
 
         .app-shell { display: flex; width: 100%; height: 100%; }
-        .nav-bar { width: 70px; background: #080e16; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 25px; z-index: 100; }
-        .nav-bar i { font-size: 22px; color: var(--sub); cursor: pointer; transition: 0.3s; }
-        .nav-bar i.active { color: var(--accent); transform: scale(1.2); }
+        .nav-bar { width: 70px; background: #010409; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; border-right: 1px solid rgba(255,255,255,0.05); }
+        .nav-bar i { font-size: 20px; color: var(--sub); cursor: pointer; transition: 0.3s; }
+        .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
 
-        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow-y: auto; }
-        .tab-content { display: none; flex-direction: column; height: 100%; padding-bottom: 80px; }
+        .sidebar { width: 350px; background: var(--panel); display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.05); }
+        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
         .tab-content.active { display: flex; }
 
+        /* НЕОНОВЫЕ КНОПКИ */
+        .btn { 
+            background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 12px; 
+            font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: var(--neon);
+        }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+
         /* ПРОФИЛЬ */
-        .p-header { background: var(--grad); height: 120px; position: relative; width: 100%; transition: 0.5s; }
-        .p-avatar { width: 100px; height: 100px; border-radius: 50%; border: 5px solid var(--panel); position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); background: #222; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .p-header { background: linear-gradient(135deg, #1a1a2e, var(--accent)); height: 120px; position: relative; }
+        .p-avatar { 
+            width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--panel); 
+            position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); 
+            background: #222; overflow: hidden; box-shadow: var(--neon);
+        }
         .p-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .p-info { margin-top: 60px; text-align: center; padding: 0 20px; }
 
-        .file-label { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: block; text-align: center; cursor: pointer; margin: 10px 0; font-size: 13px; border: 1px dashed var(--sub); transition: 0.3s; color: var(--sub); }
-        .file-label:hover { border-color: var(--accent); color: var(--text); }
-        input[type="file"] { display: none; }
+        /* ЧАТЫ */
+        .chat-item { display: flex; align-items: center; padding: 15px; gap: 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); transition: 0.2s; }
+        .chat-item:hover { background: rgba(255,255,255,0.05); }
+        .chat-item img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); }
+
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0d1117; }
+        .msg-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 70%; padding: 10px 15px; border-radius: 15px; position: relative; font-size: 14px; }
+        .msg.me { align-self: flex-end; background: var(--accent); color: #000; box-shadow: var(--neon); }
+        .msg.other { align-self: flex-start; background: #21262d; border: 1px solid rgba(255,255,255,0.1); }
         
-        input, textarea { background: var(--bg); border: none; padding: 12px; border-radius: 10px; color: #fff; margin: 5px 0; outline: none; width: 100%; border: 1px solid transparent; }
-        input:focus { border-color: var(--accent); }
-        .btn { background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn:active { transform: scale(0.95); }
+        .delete-btn { font-size: 10px; opacity: 0.5; cursor: pointer; margin-top: 5px; display: block; text-align: right; }
 
-        .post-card { background: var(--bg); margin: 15px; border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .post-card img { width: 100%; max-height: 400px; object-fit: cover; }
+        .sticker-panel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 10px; background: #161b22; border-top: 1px solid #333; }
+        .sticker { font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .sticker:hover { transform: scale(1.3); }
 
-        #edit-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        #edit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        input, textarea { background: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 10px; color: #fff; margin: 5px 0; outline: none; width: 100%; }
+        input:focus { border-color: var(--accent); box-shadow: var(--neon); }
 
         @media (max-width: 768px) {
-            .nav-bar { width: 100%; height: 60px; position: fixed; bottom: 0; flex-direction: row; justify-content: space-around; padding: 0; }
+            .nav-bar { width: 100%; height: 60px; position: fixed; bottom: 0; flex-direction: row; justify-content: space-around; padding: 0; border-right: none; border-top: 1px solid #333; }
             .sidebar { width: 100%; }
+            .chat-main { position: fixed; top: 0; left: 100%; width: 100%; height: calc(100vh - 60px); transition: 0.3s; z-index: 500; }
+            .chat-main.active { left: 0; }
         }
     </style>
 </head>
 <body>
 
 <div id="edit-modal">
-    <div style="background: var(--panel); padding: 25px; border-radius: 25px; width: 90%; max-width: 350px;">
-        <h3 style="margin-bottom:15px">Настройки профиля</h3>
-        <label class="file-label" id="l-ava">📸 Нажми, чтобы выбрать аватар
-            <input type="file" id="f-ava" accept="image/*" onchange="uploadToImgBB(this)">
+    <div style="background: var(--panel); padding: 30px; border-radius: 25px; width: 90%; max-width: 380px; border: 1px solid var(--accent); box-shadow: var(--neon);">
+        <h3>Настройки неонового профиля</h3>
+        <label style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: block; text-align: center; cursor: pointer; margin: 15px 0; border: 1px dashed var(--accent);">
+            📸 Сменить аватарку
+            <input type="file" id="f-ava" hidden accept="image/*" onchange="uploadFile(this, 'ava')">
         </label>
-        <input type="text" id="e-name" placeholder="Твое имя">
-        <input type="number" id="e-age" placeholder="Сколько лет?">
-        <textarea id="e-bio" placeholder="Пару слов о себе..."></textarea>
-        <button class="btn" onclick="saveProfile()">СОХРАНИТЬ</button>
-        <button class="btn" onclick="closeEdit()" style="background:none; margin-top:5px; color:var(--sub)">Отмена</button>
+        <input type="text" id="e-name" placeholder="Имя">
+        <input type="number" id="e-age" placeholder="Возраст">
+        <textarea id="e-bio" placeholder="О себе..."></textarea>
+        <button class="btn" onclick="saveProfile()" style="width:100%">СОХРАНИТЬ</button>
+        <button class="btn" onclick="closeEdit()" style="width:100%; background:none; color:var(--sub); box-shadow:none;">Отмена</button>
     </div>
 </div>
 
 <div id="login-screen" class="screen active">
-    <div style="margin:auto; background:var(--panel); padding:40px; border-radius:30px; text-align:center; width:90%; max-width:380px;">
-        <i class="fas fa-bolt" style="font-size: 50px; color: var(--accent); margin-bottom: 10px;"></i>
-        <h2 style="letter-spacing: 2px; margin-bottom: 20px;">VERONAGRAM</h2>
-        <input type="text" id="a-nick" placeholder="Твой ник (английский)">
+    <div style="margin:auto; background:var(--panel); padding:40px; border-radius:30px; text-align:center; width:90%; max-width:380px; border: 1px solid var(--accent); box-shadow: var(--neon);">
+        <h1 style="letter-spacing: 5px; margin-bottom: 20px; color: var(--accent); text-shadow: var(--neon);">VERONA</h1>
+        <input type="text" id="a-nick" placeholder="Никнейм">
         <input type="password" id="a-pass" placeholder="Пароль">
-        <input type="text" id="a-name" placeholder="Как тебя зовут?">
-        <button class="btn" onclick="auth()" style="margin-top:20px; padding:15px">ВОЙТИ / СОЗДАТЬ</button>
+        <input type="text" id="a-name" placeholder="Имя">
+        <button class="btn" onclick="auth()" style="width:100%; margin-top:20px; padding:15px">ВХОД / РЕГИСТРАЦИЯ</button>
     </div>
 </div>
 
 <div id="app-screen" class="screen">
     <div class="app-shell">
         <nav class="nav-bar">
-            <i class="fas fa-home" onclick="tab('chats')" id="n-chats"></i>
+            <i class="fas fa-comment-dots active" onclick="tab('chats')" id="n-chats"></i>
+            <i class="fas fa-search" onclick="tab('search')" id="n-search"></i>
             <i class="fas fa-palette" onclick="tab('pal')" id="n-pal"></i>
-            <i class="fas fa-user-circle" onclick="tab('prof')" id="n-prof"></i>
+            <i class="fas fa-user-astronaut" onclick="tab('prof')" id="n-prof"></i>
         </nav>
 
         <aside class="sidebar">
             <div id="t-chats" class="tab-content active">
-                <div style="padding:20px; font-weight:bold; border-bottom:1px solid #222;">Лента сообщений</div>
-                <div style="margin:auto; text-align:center; color:var(--sub); padding:40px;">Здесь будут твои чаты</div>
+                <div style="padding:20px; font-weight:bold; font-size:18px;">Сообщения</div>
+                <div id="chat-list"></div>
             </div>
-            
+
+            <div id="t-search" class="tab-content">
+                <div style="padding:20px; font-weight:bold;">Поиск друзей</div>
+                <input type="text" id="s-in" placeholder="Введите ник..." oninput="findUsers()" style="margin: 0 15px; width: calc(100% - 30px);">
+                <div id="s-res"></div>
+            </div>
+
             <div id="t-pal" class="tab-content">
-                <div style="padding:20px; font-weight:bold">Стиль приложения</div>
-                <div style="padding:15px; display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;">
-                    <div style="height:50px; background:#5865f2; border-radius:12px; cursor:pointer;" onclick="setTheme('#5865f2')"></div>
-                    <div style="height:50px; background:#eb459e; border-radius:12px; cursor:pointer;" onclick="setTheme('#eb459e')"></div>
-                    <div style="height:50px; background:#2ecc71; border-radius:12px; cursor:pointer;" onclick="setTheme('#2ecc71')"></div>
-                    <div style="height:50px; background:#f1c40f; border-radius:12px; cursor:pointer;" onclick="setTheme('#f1c40f')"></div>
-                    <div style="height:50px; background:#e74c3c; border-radius:12px; cursor:pointer;" onclick="setTheme('#e74c3c')"></div>
-                    <div style="height:50px; background:#9b59b6; border-radius:12px; cursor:pointer;" onclick="setTheme('#9b59b6')"></div>
+                <div style="padding:20px; font-weight:bold;">Неоновые темы</div>
+                <div style="padding:15px; display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
+                    <div style="height:50px; background:#00f2fe; border-radius:12px; box-shadow: 0 0 10px #00f2fe;" onclick="setTheme('#00f2fe')"></div>
+                    <div style="height:50px; background:#ff00ff; border-radius:12px; box-shadow: 0 0 10px #ff00ff;" onclick="setTheme('#ff00ff')"></div>
+                    <div style="height:50px; background:#39ff14; border-radius:12px; box-shadow: 0 0 10px #39ff14;" onclick="setTheme('#39ff14')"></div>
+                    <div style="height:50px; background:#ff9100; border-radius:12px; box-shadow: 0 0 10px #ff9100;" onclick="setTheme('#ff9100')"></div>
+                    <div style="height:50px; background:#ff2e2e; border-radius:12px; box-shadow: 0 0 10px #ff2e2e;" onclick="setTheme('#ff2e2e')"></div>
+                    <div style="height:50px; background:#7000ff; border-radius:12px; box-shadow: 0 0 10px #7000ff;" onclick="setTheme('#7000ff')"></div>
                 </div>
             </div>
 
             <div id="t-prof" class="tab-content">
-                <div class="p-header" id="prof-header"></div>
+                <div class="p-header"></div>
                 <div class="p-avatar" id="my-ava-box"></div>
                 <div class="p-info">
                     <h3 id="m-name-txt">---</h3>
-                    <div id="m-nick-txt" style="color:var(--accent); font-size:14px; margin-bottom:10px;">@---</div>
-                    <p id="m-bio-txt" style="color:var(--sub); font-size:14px;">---</p>
-                    <button class="btn" onclick="openEdit()" style="width:auto; padding:8px 25px; font-size:12px; margin-top:15px; background:rgba(255,255,255,0.05)">Редактировать</button>
+                    <div style="color:var(--accent); font-size:12px;">@<span id="m-nick-txt">---</span></div>
+                    <button class="btn" onclick="openEdit()" style="margin-top:15px; padding:8px 20px; font-size:12px;">РЕДАКТИРОВАТЬ</button>
                 </div>
-                
-                <div style="padding:20px; border-top:1px solid #222; margin-top:25px; background: rgba(0,0,0,0.1)">
-                    <small style="color:var(--sub); font-weight:bold;">НОВЫЙ ПОСТ</small>
-                    <label class="file-label" id="l-post">🖼️ Выбрать картинку
-                        <input type="file" id="f-post" accept="image/*" onchange="uploadToImgBB(this)">
+                <div style="padding:20px; margin-top:30px;">
+                    <label style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: block; text-align: center; cursor: pointer; border: 1px dashed var(--sub);">
+                        🖼️ Загрузить фото для поста
+                        <input type="file" hidden onchange="uploadFile(this, 'post')">
                     </label>
-                    <textarea id="p-txt" placeholder="Что нового?"></textarea>
-                    <button class="btn" onclick="addPost()">ОПУБЛИКОВАТЬ</button>
+                    <textarea id="p-txt" placeholder="Текст поста..."></textarea>
+                    <button class="btn" onclick="addPost()" style="width:100%">ОПУБЛИКОВАТЬ</button>
                 </div>
                 <div id="my-posts"></div>
             </div>
         </aside>
+
+        <main class="chat-main" id="chat-window">
+            <div style="padding:15px; background:var(--panel); display:flex; align-items:center; gap:15px; border-bottom:1px solid #333;">
+                <i class="fas fa-arrow-left" onclick="closeChat()" style="cursor:pointer"></i>
+                <img id="chat-top-ava" src="" style="width:35px; height:35px; border-radius:50%; display:none; border:1px solid var(--accent);">
+                <b id="chat-top-name">Выберите чат</b>
+                <i class="fas fa-trash" id="del-chat-btn" style="margin-left:auto; color:var(--sub); cursor:pointer; display:none;" onclick="deleteEntireChat()"></i>
+            </div>
+            <div class="msg-box" id="messages"></div>
+            
+            <div class="sticker-panel" id="stickers" style="display:none;">
+                <span class="sticker" onclick="sendMsg('🔥')">🔥</span>
+                <span class="sticker" onclick="sendMsg('❤️')">❤️</span>
+                <span class="sticker" onclick="sendMsg('😂')">😂</span>
+                <span class="sticker" onclick="sendMsg('😎')">😎</span>
+                <span class="sticker" onclick="sendMsg('👿')">👿</span>
+                <span class="sticker" onclick="sendMsg('👑')">👑</span>
+                <span class="sticker" onclick="sendMsg('💀')">💀</span>
+                <span class="sticker" onclick="sendMsg('👻')">👻</span>
+            </div>
+
+            <div id="input-area" style="padding:15px; background:var(--panel); display:none; gap:10px; align-items:center;">
+                <i class="far fa-smile" onclick="toggleStickers()" style="font-size:20px; cursor:pointer; color:var(--accent);"></i>
+                <input type="text" id="msg-in" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMsg()">
+                <button class="btn" onclick="sendMsg()" style="width:50px;"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </main>
     </div>
 </div>
 
 <script>
-    // ТВОЙ КЛЮЧ УЖЕ ЗДЕСЬ
     const IMGBB_KEY = "a4feb69baa5d7a0b6e9d3f4f80ce72bd";
-
     const firebaseConfig = {
         apiKey: "AIzaSyDQWF2K9Pmb_xIYbELL0I95yQgNGQeAr4g",
         authDomain: "veronagram-aafc1.firebaseapp.com",
@@ -147,7 +196,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
-    let me = JSON.parse(localStorage.getItem('v-user-final')) || null;
+    let me = JSON.parse(localStorage.getItem('v-neon-user')) || null;
+    let currentChat = null;
     let tempUrl = "";
 
     if(me) loginOk(me);
@@ -156,83 +206,133 @@
         const nick = document.getElementById('a-nick').value.toLowerCase().trim();
         const pass = document.getElementById('a-pass').value.trim();
         const name = document.getElementById('a-name').value.trim();
-        if(!nick || !pass) return alert("Введите ник и пароль!");
-        
+        if(!nick || !pass) return alert("Заполни поля!");
+
         const s = await db.ref('users/'+nick).once('value');
         if(s.val()) {
-            if(s.val().pass === pass) loginOk(s.val()); else alert("Неверный пароль!");
+            if(s.val().pass === pass) loginOk(s.val()); else alert("Пароль не тот!");
         } else {
-            if(!name) return alert("Введите имя для регистрации!");
-            const u = { nick, pass, name, age:"?", ava:"", bio:"" };
+            const u = { nick, pass, name, ava:"", bio:"", age:"?" };
             await db.ref('users/'+nick).set(u); loginOk(u);
         }
     }
 
     function loginOk(u) {
-        me = u; localStorage.setItem('v-user-final', JSON.stringify(me));
+        me = u; localStorage.setItem('v-neon-user', JSON.stringify(me));
         document.getElementById('login-screen').classList.remove('active');
         document.getElementById('app-screen').classList.add('active');
-        updateUI(); loadPosts();
+        updateUI(); loadFriends(); loadPosts();
     }
 
-    async function uploadToImgBB(input) {
-        const file = input.files[0];
-        if(!file) return;
-        const label = input.parentElement;
-        const originalText = label.innerText;
-        label.innerText = "⏳ Загрузка...";
+    async function uploadFile(input, mode) {
+        const file = input.files[0]; if(!file) return;
+        const formData = new FormData(); formData.append("image", file);
+        const label = input.parentElement; label.innerText = "⏳...";
 
-        const formData = new FormData();
-        formData.append("image", file);
-
-        try {
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-                method: "POST",
-                body: formData
-            });
-            const json = await res.json();
-            if(json.success) {
-                tempUrl = json.data.url;
-                label.innerText = "✅ Готово!";
-                label.style.borderColor = "var(--accent)";
-                label.style.color = "#fff";
-            }
-        } catch(e) { 
-            alert("Ошибка сети!"); 
-            label.innerText = "❌ Ошибка"; 
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: formData });
+        const data = await res.json();
+        if(data.success) {
+            tempUrl = data.data.url;
+            label.innerText = "✅ Готово";
+            if(mode === 'ava') { me.ava = tempUrl; updateUI(); }
         }
-    }
-
-    async function saveProfile() {
-        const up = {
-            name: document.getElementById('e-name').value || me.name,
-            age: document.getElementById('e-age').value || me.age,
-            bio: document.getElementById('e-bio').value || me.bio,
-            ava: tempUrl || me.ava
-        };
-        Object.assign(me, up);
-        await db.ref('users/'+me.nick).update(up);
-        localStorage.setItem('v-user-final', JSON.stringify(me));
-        updateUI(); closeEdit(); tempUrl = "";
-        alert("Профиль обновлен!");
-    }
-
-    async function addPost() {
-        const txt = document.getElementById('p-txt').value;
-        if(!tempUrl && !txt) return;
-        await db.ref('posts/'+me.nick).push({ url: tempUrl, txt, time: Date.now() });
-        document.getElementById('p-txt').value = "";
-        document.getElementById('l-post').innerText = "🖼️ Выбрать картинку";
-        document.getElementById('l-post').style.borderColor = "var(--sub)";
-        tempUrl = "";
-        alert("Пост опубликован!");
     }
 
     function updateUI() {
         document.getElementById('m-name-txt').innerText = me.name;
-        document.getElementById('m-nick-txt').innerText = "@" + me.nick;
-        document.getElementById('m-bio-txt').innerText = me.bio || "Описание не заполнено";
-        document.getElementById('my-ava-box').innerHTML = me.ava ? `<img src="${me.ava}">` : `<i class="fas fa-user" style="font-size:40px; color:#444"></i>`;
+        document.getElementById('m-nick-txt').innerText = me.nick;
+        document.getElementById('my-ava-box').innerHTML = me.ava ? `<img src="${me.ava}">` : `<i class="fas fa-user"></i>`;
+    }
+
+    async function saveProfile() {
+        me.name = document.getElementById('e-name').value || me.name;
+        me.age = document.getElementById('e-age').value || me.age;
+        me.bio = document.getElementById('e-bio').value || me.bio;
+        await db.ref('users/'+me.nick).update(me);
+        localStorage.setItem('v-neon-user', JSON.stringify(me));
+        updateUI(); closeEdit();
+    }
+
+    // ПОИСК И ДРУЗЬЯ
+    function findUsers() {
+        const q = document.getElementById('s-in').value.toLowerCase();
+        const res = document.getElementById('s-res'); res.innerHTML = "";
+        if(q.length < 2) return;
+        db.ref('users').once('value', s => {
+            const users = s.val();
+            for(let n in users) {
+                if(n.includes(q) && n !== me.nick) {
+                    const u = users[n];
+                    const d = document.createElement('div'); d.className = 'chat-item';
+                    d.innerHTML = `<img src="${u.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><b>${u.name}</b> <button onclick="addFriend('${n}','${u.name}','${u.ava}')" class="btn" style="margin-left:auto; padding:5px 10px;">+</button>`;
+                    res.appendChild(d);
+                }
+            }
+        });
+    }
+
+    async function addFriend(nick, name, ava) {
+        await db.ref('friends/'+me.nick+'/'+nick).set({ name, ava });
+        alert("Друг добавлен!");
+    }
+
+    function loadFriends() {
+        db.ref('friends/'+me.nick).on('value', s => {
+            const list = document.getElementById('chat-list'); list.innerHTML = "";
+            const data = s.val();
+            for(let n in data) {
+                const f = data[n];
+                const d = document.createElement('div'); d.className = 'chat-item';
+                d.innerHTML = `<img src="${f.ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><div><b>${f.name}</b><br><small>@${n}</small></div>`;
+                d.onclick = () => openChat(n, f.name, f.ava);
+                list.appendChild(d);
+            }
+        });
+    }
+
+    // ЧАТЫ
+    function openChat(nick, name, ava) {
+        currentChat = [me.nick, nick].sort().join("_");
+        document.getElementById('chat-top-name').innerText = name;
+        document.getElementById('chat-top-ava').src = ava || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+        document.getElementById('chat-top-ava').style.display = "block";
+        document.getElementById('input-area').style.display = "flex";
+        document.getElementById('del-chat-btn').style.display = "block";
+        document.getElementById('chat-window').classList.add('active');
+
+        db.ref('messages/'+currentChat).on('value', s => {
+            const box = document.getElementById('messages'); box.innerHTML = "";
+            const data = s.val();
+            for(let id in data) {
+                const m = data[id];
+                const d = document.createElement('div'); d.className = m.s === me.nick ? "msg me" : "msg other";
+                d.innerHTML = `${m.t} <span class="delete-btn" onclick="deleteMsg('${id}')">удалить</span>`;
+                box.appendChild(d);
+            }
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    function sendMsg(sticker) {
+        const t = sticker || document.getElementById('msg-in').value.trim();
+        if(!t) return;
+        db.ref('messages/'+currentChat).push({ s: me.nick, t: t });
+        document.getElementById('msg-in').value = "";
+        document.getElementById('stickers').style.display = "none";
+    }
+
+    function deleteMsg(id) { db.ref('messages/'+currentChat+'/'+id).remove(); }
+    function deleteEntireChat() { if(confirm("Удалить весь чат?")) db.ref('messages/'+currentChat).remove(); }
+    function toggleStickers() { 
+        const s = document.getElementById('stickers');
+        s.style.display = s.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    // ПОСТЫ
+    async function addPost() {
+        const txt = document.getElementById('p-txt').value;
+        await db.ref('posts/'+me.nick).push({ url: tempUrl, txt, time: Date.now() });
+        tempUrl = ""; document.getElementById('p-txt').value = "";
     }
 
     function loadPosts() {
@@ -241,32 +341,30 @@
             const data = s.val();
             for(let id in data) {
                 const p = data[id];
-                const d = document.createElement('div'); d.className = 'post-card';
-                d.innerHTML = `${p.url ? `<img src="${p.url}">` : ''}<div style="padding:15px; font-size:14px; line-height:1.5">${p.txt}</div>`;
+                const d = document.createElement('div');
+                d.style.cssText = "background:#161b22; margin:15px; border-radius:15px; overflow:hidden; border:1px solid #333";
+                d.innerHTML = `${p.url ? `<img src="${p.url}" style="width:100%">` : ''}<div style="padding:15px">${p.txt}</div>`;
                 list.prepend(d);
             }
         });
     }
 
-    function openEdit() {
-        document.getElementById('e-name').value = me.name;
-        document.getElementById('e-age').value = me.age === "?" ? "" : me.age;
-        document.getElementById('e-bio').value = me.bio;
-        document.getElementById('edit-modal').style.display = "flex";
-    }
-    function closeEdit() { document.getElementById('edit-modal').style.display = "none"; }
-    
+    // ИНТЕРФЕЙС
     function tab(t) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.nav-bar i').forEach(i => i.classList.remove('active'));
-        document.getElementById('t-' + t).classList.add('active');
-        document.getElementById('n-' + t).classList.add('active');
+        document.getElementById('t-'+t).classList.add('active');
+        document.getElementById('n-'+t).classList.add('active');
     }
-    
-    function setTheme(c) { 
+
+    function setTheme(c) {
         document.documentElement.style.setProperty('--accent', c);
-        document.documentElement.style.setProperty('--grad', `linear-gradient(135deg, #1a2a3a, ${c})`);
+        document.documentElement.style.setProperty('--neon', `0 0 10px ${c}, 0 0 20px ${c}44`);
     }
+
+    function closeChat() { document.getElementById('chat-window').classList.remove('active'); }
+    function openEdit() { document.getElementById('edit-modal').style.display = "flex"; }
+    function closeEdit() { document.getElementById('edit-modal').style.display = "none"; }
 </script>
 </body>
 </html>
