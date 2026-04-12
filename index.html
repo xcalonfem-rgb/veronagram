@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VERONA ULTIMATE V4</title>
+    <title>VERONA ELITE V5</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,98 +14,92 @@
             --neon: 0 0 15px var(--accent);
             --gradient: linear-gradient(45deg, var(--accent), #7000ff);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* АВТОРИЗАЦИЯ */
-        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #0a0e14; padding: 40px; border-radius: 30px; border: 2px solid var(--accent); box-shadow: var(--neon); width: 90%; max-width: 400px; text-align: center; }
-        .auth-input { background: #000; border: 1px solid #1a2634; padding: 15px; border-radius: 12px; color: #fff; width: 100%; margin-bottom: 15px; outline: none; text-align: center; }
-        .auth-btn { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; box-shadow: var(--neon); }
+        /* ЭКРАН ВХОДА */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: #0a0e14; padding: 30px; border-radius: 25px; border: 1px solid var(--accent); width: 90%; max-width: 350px; text-align: center; }
+        .auth-input { background: #000; border: 1px solid #222; padding: 12px; border-radius: 10px; color: #fff; width: 100%; margin-bottom: 10px; outline: none; text-align: center; }
+        .auth-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
 
-        /* ПУШ-УВЕДОМЛЕНИЯ */
-        #push { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); background: #161b22; border: 1px solid var(--accent); box-shadow: var(--neon); padding: 15px 25px; border-radius: 25px; z-index: 8000; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 15px; cursor: pointer; min-width: 280px; }
+        /* ПУШ-УВЕДОМЛЕНИЕ */
+        #push { position: fixed; top: -120px; left: 50%; transform: translateX(-50%); background: #161b22; border: 1px solid var(--accent); padding: 15px; border-radius: 20px; z-index: 8000; transition: 0.5s; display: flex; align-items: center; gap: 10px; min-width: 250px; box-shadow: var(--neon); }
+        #push img { width: 40px; height: 40px; border-radius: 50%; }
 
-        /* НАВИГАЦИЯ */
-        .nav-bar { width: 75px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; border-right: 1px solid rgba(255,255,255,0.05); }
-        .nav-bar i { font-size: 22px; color: #333; cursor: pointer; transition: 0.3s; }
+        /* НАВИГАЦИЯ (НИЖНЯЯ ДЛЯ ТЕЛЕФОНОВ) */
+        .nav-bar { width: 75px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 35px; border-right: 1px solid #111; }
+        .nav-bar i { font-size: 22px; color: #444; cursor: pointer; transition: 0.3s; }
         .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
 
         /* САЙДБАР */
-        .sidebar { width: 380px; background: var(--panel); display: flex; flex-direction: column; border-right: 2px solid #000; z-index: 100; }
-        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+        .sidebar { width: 380px; background: var(--panel); display: flex; flex-direction: column; border-right: 2px solid #000; }
+        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 80px; }
         .tab-content.active { display: flex; }
 
-        /* КАРТОЧКА ЮЗЕРА */
-        .user-item { display: flex; align-items: center; padding: 15px; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
-        .user-item:hover { background: rgba(255,255,255,0.03); }
+        /* ЧАТЫ */
+        .user-item { display: flex; align-items: center; padding: 15px; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .user-item img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
 
-        /* ОКНО ЧАТА */
-        .chat-main { flex: 1; display: none; flex-direction: column; background: #080a0d; }
+        /* ОСНОВНОЙ ЧАТ */
+        .chat-main { flex: 1; display: none; flex-direction: column; background: #080a0d; z-index: 1000; }
         .chat-main.active { display: flex; }
-        .chat-header { padding: 15px 25px; background: #0d1117; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--accent); }
-        .msg-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .chat-header { padding: 15px; background: #0d1117; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--accent); }
+        .msg-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
 
         /* СООБЩЕНИЯ */
-        .msg { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
-        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: 500; box-shadow: var(--neon); }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 14px; position: relative; border: 1px solid rgba(255,255,255,0.05); word-wrap: break-word; }
+        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: 500; }
         .msg.other { align-self: flex-start; background: #1c2128; }
+        audio { height: 30px; width: 160px; filter: invert(1); }
 
-        /* ПРОФИЛЬ ДРУГА (МОДАЛКА) */
-        #friend-profile { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 7000; display: none; align-items: center; justify-content: center; }
-        .profile-card { background: var(--panel); width: 90%; max-width: 400px; border-radius: 30px; border: 1px solid var(--accent); padding: 30px; text-align: center; position: relative; }
+        /* ВВОД */
+        .input-area { padding: 12px; background: #0d1117; display: flex; align-items: center; gap: 10px; border-top: 1px solid #1a202a; }
+        .input-area input { flex: 1; background: #000; border: 1px solid #333; padding: 10px 15px; border-radius: 20px; color: #fff; outline: none; }
+        .rec-active { color: #ff0055 !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* ТЕМЫ */
-        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; }
-        .theme-card { height: 60px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #333; }
-
-        /* ZOOM */
-        #zoom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; align-items: center; justify-content: center; }
-        #zoom-modal img { max-width: 90%; max-height: 80%; border: 2px solid var(--accent); }
-
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 768px) {
-            .nav-bar { width: 100%; height: 65px; flex-direction: row; position: fixed; bottom: 0; z-index: 5000; }
-            .sidebar { width: 100%; }
-            .chat-main { position: fixed; inset: 0; z-index: 4000; padding-bottom: 65px; }
+            body { flex-direction: column; }
+            .nav-bar { width: 100%; height: 70px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; padding: 0; z-index: 9000; border-top: 1px solid #222; border-right: none; }
+            .sidebar { width: 100%; height: 100vh; }
+            .chat-main { position: fixed; inset: 0; padding-bottom: 70px; }
+            .tab-content { padding-bottom: 100px; }
         }
+
+        /* ПРОФИЛЬ ДРУГА */
+        #friend-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9500; display: none; align-items: center; justify-content: center; }
+        .friend-card { background: var(--panel); width: 85%; max-width: 350px; border-radius: 25px; border: 1px solid var(--accent); padding: 25px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="auth-screen">
     <div class="auth-card">
-        <i class="fas fa-crown" style="font-size: 40px; color: var(--accent); margin-bottom: 15px;"></i>
-        <h2>VERONA LOGIN</h2><br>
+        <h2 style="color:var(--accent); letter-spacing: 3px; margin-bottom: 15px;">VERONA</h2>
         <input type="text" id="auth-nick" class="auth-input" placeholder="НИКНЕЙМ">
         <input type="password" id="auth-pass" class="auth-input" placeholder="ПАРОЛЬ">
-        <button class="auth-btn" onclick="handleAuth()">ВОЙТИ</button>
+        <button class="auth-btn" onclick="handleAuth()">ВХОД</button>
     </div>
 </div>
 
-<div id="push">
+<div id="push" onclick="this.style.top = '-120px'">
     <img id="push-ava" src="">
-    <div id="push-info">
-        <b id="push-name"></b><br>
-        <small id="push-txt"></small>
-    </div>
+    <div id="push-txt"></div>
 </div>
 
-<div id="friend-profile" onclick="this.style.display='none'">
-    <div class="profile-card" onclick="event.stopPropagation()">
-        <i class="fas fa-times" onclick="document.getElementById('friend-profile').style.display='none'" style="position:absolute; top:20px; right:20px; cursor:pointer"></i>
-        <img id="f-ava" src="" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--accent); box-shadow:var(--neon); object-fit:cover">
-        <h2 id="f-name" style="margin-top:15px"></h2>
-        <p id="f-nick" style="color:var(--accent); font-size:14px"></p>
-        <p id="f-status" style="margin:10px 0; font-style:italic; opacity:0.7"></p>
-        <div id="f-posts" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:20px"></div>
+<div id="friend-modal" onclick="this.style.display='none'">
+    <div class="friend-card" onclick="event.stopPropagation()">
+        <img id="f-ava" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--accent); object-fit:cover">
+        <h3 id="f-name" style="margin-top:10px"></h3>
+        <p id="f-status" style="opacity:0.6; font-size:13px; margin-top:5px"></p>
+        <div id="f-posts" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:15px"></div>
     </div>
 </div>
-
-<div id="zoom-modal" onclick="this.style.display='none'"><img id="zoom-img"></div>
 
 <nav class="nav-bar">
-    <i class="fas fa-comment active" onclick="tab('chats')" id="n-chats"></i>
+    <i class="fas fa-comment-dots active" onclick="tab('chats')" id="n-chats"></i>
     <i class="fas fa-users" onclick="tab('friends')" id="n-friends"></i>
     <i class="fas fa-palette" onclick="tab('themes')" id="n-themes"></i>
     <i class="fas fa-user-circle" onclick="tab('prof')" id="n-prof"></i>
@@ -113,31 +107,28 @@
 
 <aside class="sidebar">
     <div id="t-chats" class="tab-content active">
-        <h2 style="padding:20px; color:var(--accent)">MESSAGES</h2>
+        <h2 style="padding:20px;">СООБЩЕНИЯ</h2>
         <div id="chat-list"></div>
     </div>
 
     <div id="t-friends" class="tab-content">
-        <h2 style="padding:20px;">FRIENDS</h2>
-        <div style="padding:0 20px 15px">
-            <input type="text" placeholder="Найти по нику..." oninput="searchUsers(this.value)" style="width:100%; background:#000; border:1px solid var(--accent); padding:10px; color:#fff; border-radius:10px">
-        </div>
-        <div id="friends-res"></div>
+        <h2 style="padding:20px;">ДРУЗЬЯ</h2>
+        <div style="padding:0 20px 10px"><input type="text" placeholder="Поиск..." oninput="searchUsers(this.value)" style="width:100%; background:#000; border:1px solid #333; padding:10px; color:#fff; border-radius:10px"></div>
+        <div id="friends-list"></div>
     </div>
 
     <div id="t-themes" class="tab-content">
-        <h2 style="padding:20px;">20 STYLES</h2>
-        <div class="theme-grid" id="theme-list"></div>
+        <h2 style="padding:20px;">20 СТИЛЕЙ</h2>
+        <div id="theme-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px"></div>
     </div>
 
     <div id="t-prof" class="tab-content">
         <div style="padding:30px; text-align:center">
-            <img id="m-ava" src="" style="width:110px; height:110px; border-radius:50%; border:3px solid var(--accent); object-fit:cover">
+            <img id="m-ava" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--accent); object-fit:cover">
             <h2 id="m-name" style="margin-top:10px"></h2>
-            <p id="m-nick" style="color:var(--accent); font-size:13px"></p>
-            <input type="text" id="m-status" onblur="saveStatus()" placeholder="Твой статус..." style="background:#000; border:1px solid #222; padding:10px; width:100%; color:#fff; text-align:center; border-radius:10px; margin-top:10px">
-            <div style="display:flex; gap:10px; margin-top:20px">
-                <label style="flex:1; background:var(--gradient); color:#000; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer">ПОСТ <input type="file" hidden onchange="upFile(this,'post')"></label>
+            <input type="text" id="m-status" onblur="saveStatus()" style="background:none; border:none; border-bottom:1px solid var(--accent); color:#fff; text-align:center; width:100%; margin:10px 0">
+            <div style="display:flex; gap:10px; margin-top:10px">
+                <label style="flex:1; background:var(--gradient); padding:10px; border-radius:10px; color:#000; font-weight:bold; cursor:pointer">ПОСТ <input type="file" hidden onchange="upFile(this,'post')"></label>
                 <label style="flex:1; background:#222; padding:10px; border-radius:10px; cursor:pointer">АВА <input type="file" hidden onchange="upFile(this,'ava')"></label>
             </div>
             <div id="my-posts" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:20px"></div>
@@ -148,14 +139,15 @@
 <main class="chat-main" id="chat-window">
     <div class="chat-header">
         <i class="fas fa-arrow-left" onclick="closeChat()"></i>
-        <img id="c-ava" src="" onclick="viewFriendProfile(chatFriend)" style="width:45px; height:45px; border-radius:50%; cursor:pointer">
-        <b id="c-name" onclick="viewFriendProfile(chatFriend)" style="cursor:pointer"></b>
-        <i class="fas fa-trash" onclick="clearChat()" style="margin-left:auto; opacity:0.3; cursor:pointer"></i>
+        <img id="c-ava" src="" onclick="openFriendProf(chatFriend)" style="width:40px; height:40px; border-radius:50%; cursor:pointer">
+        <b id="c-name" onclick="openFriendProf(chatFriend)"></b>
+        <i class="fas fa-broom" onclick="clearChat()" style="margin-left:auto; opacity:0.3"></i>
     </div>
     <div class="msg-box" id="messages"></div>
-    <div class="input-area" style="padding:15px; background:#0d1117; display:flex; gap:10px; border-top:1px solid #1a202a">
-        <input type="text" id="msg-in" placeholder="Написать..." onkeypress="if(event.key==='Enter') send()" style="flex:1; background:#000; border:1px solid #333; padding:12px; border-radius:20px; color:#fff; outline:none">
-        <i class="fas fa-paper-plane" onclick="send()" style="color:var(--accent); font-size:22px; cursor:pointer"></i>
+    <div class="input-area">
+        <i class="fas fa-microphone" id="mic-btn" onclick="toggleVoice()" style="color:var(--accent); font-size:20px; cursor:pointer"></i>
+        <input type="text" id="msg-in" placeholder="Напиши..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <i class="fas fa-paper-plane" onclick="sendMsg()" style="color:var(--accent); font-size:20px;"></i>
     </div>
 </main>
 
@@ -171,8 +163,8 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let me = JSON.parse(localStorage.getItem('v4-user')) || null;
-    let currentChat = null, chatFriend = null;
+    let me = JSON.parse(localStorage.getItem('v5-user')) || null;
+    let currentChat = null, chatFriend = null, mediaRecorder, chunks = [];
 
     if(me) loginOk(me);
 
@@ -183,18 +175,17 @@
         const s = await db.ref('users/'+nick).once('value');
         if(s.exists() && s.val().pass === pass) loginOk(s.val());
         else {
-            const u = { nick, pass, name:nick, ava:"", status:"New Legend", posts:[] };
+            const u = { nick, pass, name:nick, ava:"", status:"Verona Member", posts:[] };
             await db.ref('users/'+nick).set(u); loginOk(u);
         }
     }
 
     function loginOk(u) {
-        me = u; localStorage.setItem('v4-user', JSON.stringify(me));
+        me = u; localStorage.setItem('v5-user', JSON.stringify(me));
         document.getElementById('auth-screen').style.display = 'none';
         db.ref('users/'+me.nick).on('value', s => {
             const d = s.val();
             document.getElementById('m-name').innerText = d.name;
-            document.getElementById('m-nick').innerText = "@"+d.nick;
             document.getElementById('m-ava').src = d.ava || 'https://via.placeholder.com/100';
             document.getElementById('m-status').value = d.status || "";
             renderPosts('my-posts', d.posts);
@@ -202,43 +193,79 @@
         loadThemes(); loadChatList(); listenPush();
     }
 
-    function renderPosts(id, posts) {
+    function renderPosts(id, p) {
         const g = document.getElementById(id); g.innerHTML = "";
-        if(posts) posts.forEach(p => g.innerHTML += `<img src="${p}" onclick="zoom('${p}')" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:5px">`);
+        if(p) p.forEach(url => g.innerHTML += `<img src="${url}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:5px">`);
     }
 
-    async function viewFriendProfile(nick) {
-        const s = await db.ref('users/'+nick).once('value');
-        const d = s.val();
+    async function toggleVoice() {
+        const btn = document.getElementById('mic-btn');
+        if(!mediaRecorder || mediaRecorder.state === "inactive") {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            chunks = [];
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const r = new FileReader();
+                r.readAsDataURL(new Blob(chunks, { type: 'audio/webm' }));
+                r.onloadend = () => sendMsg(r.result, 'voice');
+            };
+            mediaRecorder.start(); btn.classList.add('rec-active');
+        } else { mediaRecorder.stop(); btn.classList.remove('rec-active'); }
+    }
+
+    function sendMsg(val, type='text') {
+        const t = val || document.getElementById('msg-in').value.trim(); if(!t) return;
+        db.ref('messages/'+currentChat).push({ s:me.nick, t, type, time:Date.now() });
+        db.ref('notif/'+chatFriend).set({ from:me.name, t:type==='voice'?'🎤 ГС':t, ava:me.ava, nick:me.nick, time:Date.now() });
+        document.getElementById('msg-in').value = "";
+    }
+
+    function openChat(nick, name, ava) {
+        chatFriend = nick; currentChat = [me.nick, nick].sort().join("_");
+        document.getElementById('c-name').innerText = name;
+        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/40';
+        document.getElementById('chat-window').classList.add('active');
+        db.ref('messages/'+currentChat).on('value', s => {
+            const b = document.getElementById('messages'); b.innerHTML = "";
+            s.forEach(m => {
+                const msg = m.val();
+                const d = document.createElement('div');
+                d.className = `msg ${msg.s === me.nick ? 'me' : 'other'}`;
+                if(msg.type === 'voice') d.innerHTML = `<audio src="${msg.t}" controls></audio>`;
+                else d.innerText = msg.t;
+                b.appendChild(d);
+            });
+            b.scrollTop = b.scrollHeight;
+        });
+    }
+
+    async function openFriendProf(nick) {
+        const s = await db.ref('users/'+nick).once('value'); const d = s.val();
         document.getElementById('f-name').innerText = d.name;
-        document.getElementById('f-nick').innerText = "@"+d.nick;
+        document.getElementById('f-status').innerText = d.status;
         document.getElementById('f-ava').src = d.ava || 'https://via.placeholder.com/100';
-        document.getElementById('f-status').innerText = d.status || "";
         renderPosts('f-posts', d.posts);
-        document.getElementById('friend-profile').style.display = 'flex';
+        document.getElementById('friend-modal').style.display = 'flex';
     }
 
     function searchUsers(q) {
-        if(!q) return document.getElementById('friends-res').innerHTML = "";
+        if(!q) return document.getElementById('friends-list').innerHTML = "";
         db.ref('users').once('value', s => {
             let h = "";
             s.forEach(u => {
                 const user = u.val();
                 if(user.nick.includes(q.toLowerCase()) && user.nick !== me.nick) {
-                    h += `<div class="user-item">
-                        <img src="${user.ava || 'https://via.placeholder.com/50'}" onclick="viewFriendProfile('${user.nick}')">
-                        <b onclick="startChat('${user.nick}','${user.name}','${user.ava}')">${user.name}</b>
-                        <i class="fas fa-user-plus" style="margin-left:auto; color:var(--accent)" onclick="viewFriendProfile('${user.nick}')"></i>
-                    </div>`;
+                    h += `<div class="user-item" onclick="startChat('${user.nick}','${user.name}','${user.ava}')">
+                        <img src="${user.ava || 'https://via.placeholder.com/50'}"><b>${user.name}</b></div>`;
                 }
             });
-            document.getElementById('friends-res').innerHTML = h;
+            document.getElementById('friends-list').innerHTML = h;
         });
     }
 
     async function startChat(nick, name, ava) {
-        await db.ref('friends/'+me.nick+'/'+nick).set({name, ava});
-        openChat(nick, name, ava);
+        await db.ref('friends/'+me.nick+'/'+nick).set({name, ava}); tab('chats'); openChat(nick, name, ava);
     }
 
     function loadChatList() {
@@ -247,35 +274,9 @@
             s.forEach(f => {
                 const fr = f.val();
                 l.innerHTML += `<div class="user-item" onclick="openChat('${f.key}','${fr.name}','${fr.ava}')">
-                    <img src="${fr.ava || 'https://via.placeholder.com/50'}"><b>${fr.name}</b>
-                </div>`;
+                    <img src="${fr.ava || 'https://via.placeholder.com/50'}"><b>${fr.name}</b></div>`;
             });
         });
-    }
-
-    function openChat(nick, name, ava) {
-        chatFriend = nick; currentChat = [me.nick, nick].sort().join("_");
-        document.getElementById('c-name').innerText = name;
-        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/50';
-        document.getElementById('chat-window').classList.add('active');
-        db.ref('messages/'+currentChat).on('value', s => {
-            const b = document.getElementById('messages'); b.innerHTML = "";
-            s.forEach(m => {
-                const msg = m.val();
-                const d = document.createElement('div');
-                d.className = `msg ${msg.s === me.nick ? 'me' : 'other'}`;
-                d.innerText = msg.t;
-                b.appendChild(d);
-            });
-            b.scrollTop = b.scrollHeight;
-        });
-    }
-
-    function send() {
-        const t = document.getElementById('msg-in').value.trim(); if(!t) return;
-        db.ref('messages/'+currentChat).push({s:me.nick, t, time:Date.now()});
-        db.ref('notif/'+chatFriend).set({from:me.name, t, ava:me.ava, nick:me.nick, time:Date.now()});
-        document.getElementById('msg-in').value = "";
     }
 
     function listenPush() {
@@ -283,14 +284,18 @@
             const d = s.val();
             if(d && Date.now() - d.time < 3000) {
                 document.getElementById('push-ava').src = d.ava || 'https://via.placeholder.com/40';
-                document.getElementById('push-name').innerText = d.from;
-                document.getElementById('push-txt').innerText = d.t;
-                const p = document.getElementById('push');
-                p.style.top = "20px";
+                document.getElementById('push-txt').innerHTML = `<b>${d.from}</b><br>${d.t}`;
+                const p = document.getElementById('push'); p.style.top = "20px";
                 p.onclick = () => { openChat(d.nick, d.from, d.ava); p.style.top = "-120px"; };
                 setTimeout(() => p.style.top = "-120px", 4000);
             }
         });
+    }
+
+    function loadThemes() {
+        const box = document.getElementById('theme-grid');
+        const st = [{n:'Neon', p:'#00f2fe', s:'#7000ff'}, {n:'Toxic', p:'#adff2f', s:'#000'}, {n:'Vamp', p:'#ff0000', s:'#000'}, {n:'Gold', p:'#ffd700', s:'#222'}, {n:'Sky', p:'#89f7fe', s:'#66a6ff'}, {n:'Mint', p:'#43e97b', s:'#38f9d7'}];
+        st.forEach(t => box.innerHTML += `<div style="background:linear-gradient(45deg, ${t.p}, ${t.s}); padding:15px; border-radius:12px; text-align:center; font-weight:bold; cursor:pointer" onclick="setTheme('${t.p}','${t.s}')">${t.n}</div>`);
     }
 
     async function upFile(input, type) {
@@ -301,27 +306,13 @@
         if(d.success) {
             const url = d.data.url;
             if(type === 'ava') await db.ref('users/'+me.nick).update({ava:url});
-            else {
-                const p = me.posts || []; p.push(url);
-                await db.ref('users/'+me.nick).update({posts:p});
-            }
+            else { const p = me.posts || []; p.push(url); await db.ref('users/'+me.nick).update({posts:p}); }
         }
     }
 
-    function saveStatus() { db.ref('users/'+me.nick).update({status: document.getElementById('m-status').value}); }
-    function loadThemes() {
-        const box = document.getElementById('theme-list'); box.innerHTML = "";
-        const styles = [
-            {n:'Neon', p:'#00f2fe', s:'#7000ff'}, {n:'Vampire', p:'#ff0000', s:'#000'},
-            {n:'Toxic', p:'#adff2f', s:'#111'}, {n:'Gold', p:'#ffd700', s:'#444'},
-            {n:'Ocean', p:'#00c6ff', s:'#0072ff'}, {n:'Sunset', p:'#f12711', s:'#f5af19'},
-            {n:'Mint', p:'#43e97b', s:'#38f9d7'}, {n:'Rose', p:'#f093fb', s:'#f5576c'}
-        ]; // Здесь можно добавить еще 12 до 20 штук
-        styles.forEach(t => box.innerHTML += `<div class="theme-card" style="background:linear-gradient(45deg, ${t.p}, ${t.s})" onclick="setTheme('${t.p}','${t.s}')">${t.n}</div>`);
-    }
     function setTheme(p, s) { document.documentElement.style.setProperty('--accent', p); document.documentElement.style.setProperty('--gradient', `linear-gradient(45deg, ${p}, ${s})`); }
-    function zoom(u) { document.getElementById('zoom-img').src = u; document.getElementById('zoom-modal').style.display='flex'; }
     function tab(t) { document.querySelectorAll('.tab-content, .nav-bar i').forEach(el => el.classList.remove('active')); document.getElementById('t-'+t).classList.add('active'); document.getElementById('n-'+t).classList.add('active'); }
+    function saveStatus() { db.ref('users/'+me.nick).update({status: document.getElementById('m-status').value}); }
     function closeChat() { document.getElementById('chat-window').classList.remove('active'); }
     function clearChat() { if(confirm("Очистить?")) db.ref('messages/'+currentChat).remove(); }
 </script>
