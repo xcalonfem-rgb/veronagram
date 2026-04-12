@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VERONA ULTIMATE V6</title>
+    <title>VERONA ELITE V7</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -11,7 +11,7 @@
     <style>
         :root {
             --accent: #00f2fe; --bg: #05070a; --panel: #0d1117; --text: #fff; 
-            --neon: 0 0 10px var(--accent);
+            --neon: 0 0 15px var(--accent);
             --gradient: linear-gradient(45deg, var(--accent), #7000ff);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -19,53 +19,66 @@
 
         /* AUTH */
         #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: #0a0e14; padding: 30px; border-radius: 25px; border: 1px solid var(--accent); width: 90%; max-width: 350px; text-align: center; box-shadow: var(--neon); }
-        .auth-input { background: #000; border: 1px solid #222; padding: 12px; border-radius: 10px; color: #fff; width: 100%; margin-bottom: 10px; outline: none; text-align: center; }
-        .auth-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
+        .auth-card { background: #0a0e14; padding: 35px; border-radius: 30px; border: 1px solid var(--accent); width: 90%; max-width: 360px; text-align: center; box-shadow: var(--neon); }
+        .auth-input { background: #000; border: 1px solid #222; padding: 14px; border-radius: 12px; color: #fff; width: 100%; margin-bottom: 12px; outline: none; text-align: center; }
+        .auth-btn { background: var(--accent); color: #000; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
-        /* NAV & SIDEBAR */
-        .nav-bar { width: 75px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 35px; border-right: 1px solid #1a1a1a; }
-        .nav-bar i { font-size: 22px; color: #444; cursor: pointer; transition: 0.3s; }
-        .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.1); }
+        /* NAV & SIDEBAR (PC) */
+        .nav-bar { width: 80px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 40px; border-right: 1px solid #1a1a1a; }
+        .nav-bar i { font-size: 24px; color: #444; cursor: pointer; transition: 0.3s; }
+        .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
+
         .sidebar { width: 380px; background: var(--panel); display: flex; flex-direction: column; border-right: 2px solid #000; }
-        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 20px; }
         .tab-content.active { display: flex; }
 
-        /* CHAT WINDOW */
-        .chat-main { flex: 1; display: none; flex-direction: column; background: #080a0d; position: relative; }
+        /* CHAT SYSTEM */
+        .chat-main { flex: 1; display: none; flex-direction: column; background: #080a0d; z-index: 1000; }
         .chat-main.active { display: flex; }
         .chat-header { padding: 15px; background: #0d1117; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--accent); }
-        .msg-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
 
-        /* MESSAGES & REACTION */
-        .msg { max-width: 85%; padding: 10px 15px; border-radius: 18px; font-size: 15px; position: relative; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s; }
-        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; border-bottom-right-radius: 4px; }
+        /* MESSAGES */
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; position: relative; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: 500; border-bottom-right-radius: 4px; }
         .msg.other { align-self: flex-start; background: #1c2128; border-bottom-left-radius: 4px; }
-        .reply-box { font-size: 12px; opacity: 0.7; border-left: 2px solid #fff; padding-left: 5px; margin-bottom: 5px; background: rgba(0,0,0,0.1); }
-        .like-tag { position: absolute; bottom: -8px; right: 10px; font-size: 14px; background: #161b22; border-radius: 10px; padding: 2px 5px; border: 1px solid var(--accent); }
+        .reply-in-msg { font-size: 12px; opacity: 0.7; border-left: 2px solid #fff; padding-left: 6px; margin-bottom: 6px; display: block; }
+        .like-tag { position: absolute; bottom: -10px; right: 10px; background: #000; border: 1px solid var(--accent); border-radius: 10px; padding: 2px 6px; font-size: 12px; }
 
         /* INPUT AREA */
         .input-wrap { background: #0d1117; border-top: 1px solid #1a202a; display: flex; flex-direction: column; }
-        .reply-preview { padding: 8px 15px; background: #161b22; display: none; align-items: center; justify-content: space-between; border-left: 3px solid var(--accent); }
-        .input-area { padding: 10px 15px; display: flex; align-items: center; gap: 12px; }
-        .input-area input { flex: 1; background: #000; border: 1px solid #333; padding: 10px 15px; border-radius: 20px; color: #fff; outline: none; }
+        .reply-preview { padding: 10px 15px; background: #161b22; display: none; align-items: center; justify-content: space-between; border-left: 4px solid var(--accent); }
+        .input-area { padding: 12px 15px; display: flex; align-items: center; gap: 12px; }
+        .input-area input { flex: 1; background: #000; border: 1px solid #333; padding: 12px 18px; border-radius: 25px; color: #fff; outline: none; font-size: 16px; }
+        
+        /* VOICE UI & EMOJI */
+        #voice-info { display: none; align-items: center; gap: 10px; color: var(--accent); font-weight: bold; flex: 1; }
+        .rec-dot { width: 10px; height: 10px; background: #ff0055; border-radius: 50%; animation: pulse 1s infinite; box-shadow: 0 0 10px #ff0055; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        #emoji-panel { display: none; height: 180px; overflow-y: auto; background: #000; grid-template-columns: repeat(8, 1fr); padding: 10px; border-top: 1px solid #222; }
+        .emoji-btn { font-size: 24px; padding: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .emoji-btn:active { transform: scale(1.3); }
 
-        /* VOICE UI */
-        #voice-ui { display: none; align-items: center; gap: 15px; flex: 1; color: var(--accent); font-weight: bold; }
-        .dot { width: 10px; height: 10px; background: red; border-radius: 50%; animation: blink 0.8s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        /* PROFILE STYLE (RESTORED) */
+        .prof-header { padding: 40px 20px; text-align: center; }
+        .prof-ava { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; box-shadow: var(--neon); }
+        .posts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; }
+        .post-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid #1a1a1a; }
 
-        /* EMOJI BOX */
-        #emoji-box { height: 150px; overflow-y: auto; display: none; grid-template-columns: repeat(8, 1fr); padding: 10px; background: #000; border-top: 1px solid #222; }
-        .emoji { font-size: 24px; text-align: center; cursor: pointer; padding: 5px; }
-
-        /* MOBILE FIX */
+        /* MOBILE OPTIMIZATION */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .nav-bar { width: 100%; height: 70px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; z-index: 9000; background: #000; border-top: 1px solid #1a1a1a; padding-bottom: env(safe-area-inset-bottom); }
+            .nav-bar { 
+                width: 100%; height: 75px; flex-direction: row; justify-content: space-around; 
+                position: fixed; bottom: 0; padding: 0; z-index: 9000; 
+                background: #000; border-top: 2px solid #111; padding-bottom: env(safe-area-inset-bottom);
+            }
+            .nav-bar i { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
             .sidebar { width: 100%; height: 100vh; }
-            .chat-main { position: fixed; inset: 0; z-index: 9500; padding-bottom: 0; }
-            .input-wrap { padding-bottom: calc(5px + env(safe-area-inset-bottom)); }
+            .tab-content { padding-bottom: 90px; }
+            .chat-main { position: fixed; inset: 0; padding-bottom: 0; z-index: 9500; }
+            .input-wrap { padding-bottom: env(safe-area-inset-bottom); }
         }
     </style>
 </head>
@@ -73,101 +86,123 @@
 
 <div id="auth-screen">
     <div class="auth-card">
-        <h2 style="color:var(--accent); letter-spacing: 5px;">VERONA V6</h2><br>
+        <h2 style="color:var(--accent); letter-spacing: 5px;">VERONA</h2><br>
         <input type="text" id="auth-nick" class="auth-input" placeholder="НИКНЕЙМ">
         <input type="password" id="auth-pass" class="auth-input" placeholder="ПАРОЛЬ">
-        <button class="auth-btn" onclick="handleAuth()">ВОЙТИ</button>
+        <button class="auth-btn" onclick="handleAuth()">ВХОД В СИСТЕМУ</button>
     </div>
 </div>
 
 <nav class="nav-bar">
     <i class="fas fa-comment-dots active" onclick="tab('chats')" id="n-chats"></i>
     <i class="fas fa-users" onclick="tab('friends')" id="n-friends"></i>
-    <i class="fas fa-smile" onclick="toggleEmoji()" id="n-emoji"></i>
+    <i class="fas fa-palette" onclick="tab('themes')" id="n-themes"></i>
     <i class="fas fa-user-circle" onclick="tab('prof')" id="n-prof"></i>
 </nav>
 
 <aside class="sidebar">
     <div id="t-chats" class="tab-content active">
-        <h2 style="padding:20px; color:var(--accent)">ЧАТЫ</h2>
+        <h2 style="padding:25px 20px 10px; color:var(--accent)">MESSAGES</h2>
         <div id="chat-list"></div>
     </div>
     <div id="t-friends" class="tab-content">
-        <h2 style="padding:20px;">ДРУЗЬЯ</h2>
-        <div style="padding:0 20px 10px"><input type="text" placeholder="Найти..." oninput="searchUsers(this.value)" style="width:100%; background:#000; border:1px solid var(--accent); padding:10px; color:#fff; border-radius:10px"></div>
+        <h2 style="padding:25px 20px 10px;">FRIENDS</h2>
+        <div style="padding:0 20px 10px"><input type="text" placeholder="Поиск душ..." oninput="searchUsers(this.value)" style="width:100%; background:#000; border:1px solid var(--accent); padding:12px; color:#fff; border-radius:12px"></div>
         <div id="friends-list"></div>
     </div>
+    <div id="t-themes" class="tab-content">
+        <h2 style="padding:25px 20px 10px;">THEMES</h2>
+        <div id="theme-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:20px"></div>
+    </div>
     <div id="t-prof" class="tab-content">
-        <div style="padding:30px; text-align:center">
-            <img id="m-ava" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--accent); object-fit:cover">
-            <h2 id="m-name" style="margin-top:10px"></h2>
-            <div id="my-posts" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:20px"></div>
+        <div class="prof-header">
+            <img id="m-ava" src="" class="prof-ava">
+            <h2 id="m-name" style="margin-top:15px;"></h2>
+            <input type="text" id="m-status" onblur="saveStatus()" style="background:none; border:none; border-bottom:1px solid var(--accent); color:#aaa; text-align:center; width:80%; margin:15px 0;">
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+                <label style="background:var(--gradient); padding:12px 20px; border-radius:12px; color:#000; font-weight:bold; cursor:pointer">ПОСТ <input type="file" hidden onchange="upFile(this,'post')"></label>
+                <label style="background:#1c2128; padding:12px 20px; border-radius:12px; cursor:pointer; border:1px solid var(--accent)">АВА <input type="file" hidden onchange="upFile(this,'ava')"></label>
+            </div>
         </div>
+        <div id="my-posts" class="posts-grid"></div>
     </div>
 </aside>
 
 <main class="chat-main" id="chat-window">
     <div class="chat-header">
-        <i class="fas fa-arrow-left" onclick="closeChat()"></i>
-        <img id="c-ava" src="" style="width:40px; height:40px; border-radius:50%">
+        <i class="fas fa-chevron-left" onclick="closeChat()"></i>
+        <img id="c-ava" src="" style="width:40px; height:40px; border-radius:50%; border:1px solid var(--accent)">
         <b id="c-name">Чат</b>
-        <i class="fas fa-trash" onclick="clearChat()" style="margin-left:auto; opacity:0.5"></i>
+        <i class="fas fa-trash-alt" onclick="clearChat()" style="margin-left:auto; opacity:0.4; padding:5px"></i>
     </div>
     <div class="msg-box" id="messages"></div>
 
     <div class="input-wrap">
         <div id="reply-preview" class="reply-preview">
-            <span id="reply-text">Ответ на...</span>
+            <span id="reply-text" style="font-size:13px; opacity:0.8">Ответ...</span>
             <i class="fas fa-times" onclick="cancelReply()"></i>
         </div>
-        <div id="emoji-box"></div>
+        <div id="emoji-panel"></div>
         <div class="input-area">
-            <div id="voice-ui"><div class="dot"></div> <span id="v-timer">0:00</span> <i class="fas fa-times" onclick="cancelVoice()" style="color:red; margin-left:10px"></i></div>
-            <i class="fas fa-microphone" id="mic-btn" onclick="startVoice()"></i>
+            <div id="voice-info">
+                <div class="rec-dot"></div> <span id="rec-timer">0:00</span>
+                <i class="fas fa-times" onclick="stopRec(false)" style="color:#ff0055; margin-left:15px; font-size:20px"></i>
+            </div>
+            <i class="fas fa-microphone" id="mic-btn" onclick="startRec()" style="color:var(--accent); font-size:22px;"></i>
+            <i class="far fa-smile" onclick="toggleEmoji()" style="color:var(--accent); font-size:22px; cursor:pointer"></i>
             <input type="text" id="msg-in" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') send()">
-            <i class="fas fa-paper-plane" onclick="send()" style="color:var(--accent)"></i>
+            <i class="fas fa-paper-plane" onclick="send()" style="color:var(--accent); font-size:22px;"></i>
         </div>
     </div>
 </main>
 
 <script>
     const IMGBB_KEY = "a4feb69baa5d7a0b6e9d3f4f80ce72bd";
-    const firebaseConfig = {
-        databaseURL: "https://veronagram-aafc1-default-rtdb.firebaseio.com",
-    };
+    const firebaseConfig = { databaseURL: "https://veronagram-aafc1-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let me = JSON.parse(localStorage.getItem('v6-user')), currentChat, chatFriend, replyMsg = null;
-    let recorder, chunks = [], recInterval, seconds = 0;
+    let me = JSON.parse(localStorage.getItem('v7-user')), currentChat, chatFriend, replyMsg = null;
+    let recorder, chunks = [], recInt, sec = 0;
 
     if(me) loginOk(me);
 
     async function handleAuth() {
-        const nick = document.getElementById('auth-nick').value.toLowerCase().trim();
-        if(!nick) return;
-        const u = { nick, name:nick, ava:"", status:"Verona", posts:[] };
-        await db.ref('users/'+nick).set(u); loginOk(u);
+        const n = document.getElementById('auth-nick').value.toLowerCase().trim();
+        const p = document.getElementById('auth-pass').value;
+        if(!n || !p) return;
+        const s = await db.ref('users/'+n).once('value');
+        if(s.exists() && s.val().pass !== p) return alert("Пароль неверный");
+        const u = s.exists() ? s.val() : { nick:n, pass:p, name:n, ava:"", status:"Verona Soul", posts:[] };
+        if(!s.exists()) await db.ref('users/'+n).set(u);
+        loginOk(u);
     }
 
     function loginOk(u) {
-        me = u; localStorage.setItem('v6-user', JSON.stringify(me));
+        me = u; localStorage.setItem('v7-user', JSON.stringify(me));
         document.getElementById('auth-screen').style.display = 'none';
-        loadChatList(); initEmoji();
+        db.ref('users/'+me.nick).on('value', s => {
+            const d = s.val(); if(!d) return;
+            document.getElementById('m-name').innerText = d.name;
+            document.getElementById('m-ava').src = d.ava || 'https://via.placeholder.com/100';
+            document.getElementById('m-status').value = d.status || "";
+            renderPosts('my-posts', d.posts);
+        });
+        loadThemes(); loadChatList(); initEmoji();
     }
 
     function initEmoji() {
-        const box = document.getElementById('emoji-box');
-        const list = "😀,😂,🤣,😊,😍,🥰,😘,😎,🤩,🥳,😏,😒,😞,😔,😟,😢,😭,😱,🤬,😡,💩,🤡,👻,👽,🤖,👾,🎃,👹,💀,🦾,🤙,👍,👎,👊,🔥,🌈,⚡️,✨,👑,💎,⛓️,🖤,❤️,🔞,💸,🔫,💣,🩸,🌪️,🌊";
+        const p = document.getElementById('emoji-panel');
+        const list = "😀,😂,😊,😍,🥰,😎,😏,😒,😔,😢,😭,😱,🔥,✨,💎,👑,🖤,❤️,👍,🙌,👏,🤙,🔞,💸,🔫,💣,🩸,💀,👽,👾,🤖,👻,🤡,💩,🌪️,🌊,🌈,⚡️,🌩️,🌑,🌟,🍎,🍔,🍕,🍺,🎸,🎮,📱";
         list.split(',').forEach(e => {
-            box.innerHTML += `<span class="emoji" onclick="document.getElementById('msg-in').value += '${e}'">${e}</span>`;
+            p.innerHTML += `<div class="emoji-btn" onclick="document.getElementById('msg-in').value += '${e}'">${e}</div>`;
         });
     }
 
     function openChat(nick, name, ava) {
         chatFriend = nick; currentChat = [me.nick, nick].sort().join("_");
         document.getElementById('c-name').innerText = name;
-        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/40';
+        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/100';
         document.getElementById('chat-window').classList.add('active');
         db.ref('messages/'+currentChat).on('value', s => {
             const b = document.getElementById('messages'); b.innerHTML = "";
@@ -175,117 +210,121 @@
                 const msg = m.val();
                 const d = document.createElement('div');
                 d.className = `msg ${msg.s === me.nick ? 'me' : 'other'}`;
-                d.id = m.key;
-                
-                let html = "";
-                if(msg.reply) html += `<div class="reply-box">${msg.reply}</div>`;
-                if(msg.type === 'voice') html += `<audio src="${msg.t}" controls></audio>`;
-                else html += msg.t;
-                if(msg.liked) html += `<span class="like-tag">❤️</span>`;
-
-                d.innerHTML = html;
+                let h = "";
+                if(msg.reply) h += `<small class="reply-in-msg">⤴ ${msg.reply}</small>`;
+                if(msg.type === 'voice') h += `<audio src="${msg.t}" controls style="height:30px; width:160px; filter:invert(1)"></audio>`;
+                else h += msg.t;
+                if(msg.liked) h += `<span class="like-tag">❤️</span>`;
+                d.innerHTML = h;
                 d.onclick = () => setReply(msg.t, m.key);
-                d.ondblclick = () => likeMsg(m.key, msg.liked);
-                
-                // Долгое нажатие для удаления
-                let timer;
-                d.onmousedown = () => timer = setTimeout(() => deleteMsg(m.key), 1000);
-                d.onmouseup = () => clearTimeout(timer);
-
+                d.ondblclick = () => db.ref(`messages/${currentChat}/${m.key}`).update({liked: !msg.liked});
+                d.oncontextmenu = (e) => { e.preventDefault(); if(confirm("Удалить?")) m.ref.remove(); };
                 b.appendChild(d);
             });
             b.scrollTop = b.scrollHeight;
         });
     }
 
-    function send(t = null, type = 'text') {
-        const txt = t || document.getElementById('msg-in').value.trim();
-        if(!txt) return;
-        const msgData = { s:me.nick, t:txt, type, time:Date.now() };
-        if(replyMsg) { msgData.reply = replyMsg.txt; cancelReply(); }
-        db.ref('messages/'+currentChat).push(msgData);
-        document.getElementById('msg-in').value = "";
-    }
-
-    /* ФУНКЦИИ ГС */
-    async function startVoice() {
+    /* VOICE REC LOGIC */
+    async function startRec() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         recorder = new MediaRecorder(stream);
         chunks = [];
         recorder.ondataavailable = e => chunks.push(e.data);
         recorder.onstop = () => {
-            if(seconds > 0) {
+            if(sec > 0) {
                 const blob = new Blob(chunks, { type: 'audio/webm' });
-                const r = new FileReader();
-                r.readAsDataURL(blob);
+                const r = new FileReader(); r.readAsDataURL(blob);
                 r.onloadend = () => send(r.result, 'voice');
             }
         };
         recorder.start();
         document.getElementById('mic-btn').style.display = 'none';
         document.getElementById('msg-in').style.display = 'none';
-        document.getElementById('voice-ui').style.display = 'flex';
-        seconds = 0;
-        recInterval = setInterval(() => {
-            seconds++;
-            let m = Math.floor(seconds/60), s = seconds%60;
-            document.getElementById('v-timer').innerText = `${m}:${s<10?'0':''}${s}`;
+        document.getElementById('voice-info').style.display = 'flex';
+        sec = 0;
+        recInt = setInterval(() => {
+            sec++;
+            let m = Math.floor(sec/60), s = sec%60;
+            document.getElementById('rec-timer').innerText = `${m}:${s<10?'0':''}${s}`;
         }, 1000);
     }
 
-    function cancelVoice() {
-        seconds = 0; recorder.stop(); stopVoiceUI();
-    }
-
-    function stopVoiceUI() {
-        clearInterval(recInterval);
+    function stopRec(save = true) {
+        clearInterval(recInt);
+        if(!save) sec = 0;
+        recorder.stop();
         document.getElementById('mic-btn').style.display = 'block';
         document.getElementById('msg-in').style.display = 'block';
-        document.getElementById('voice-ui').style.display = 'none';
+        document.getElementById('voice-info').style.display = 'none';
     }
 
-    document.getElementById('mic-btn').onclick = () => {
-        if(!recorder || recorder.state === 'inactive') startVoice();
-        else { recorder.stop(); stopVoiceUI(); }
-    };
+    document.getElementById('mic-btn').addEventListener('click', () => {
+        if(!recorder || recorder.state === 'inactive') startRec();
+        else stopRec(true);
+    });
 
-    /* ОТВЕТЫ И ЛАЙКИ */
-    function setReply(txt, id) {
-        replyMsg = { txt: txt.substring(0,30), id };
-        document.getElementById('reply-text').innerText = "Ответ на: " + replyMsg.txt;
+    function send(t = null, type = 'text') {
+        const txt = t || document.getElementById('msg-in').value.trim();
+        if(!txt) return;
+        const data = { s:me.nick, t:txt, type, time:Date.now() };
+        if(replyMsg) { data.reply = replyMsg.t.substring(0,30); cancelReply(); }
+        db.ref('messages/'+currentChat).push(data);
+        document.getElementById('msg-in').value = "";
+        document.getElementById('emoji-panel').style.display = 'none';
+    }
+
+    function setReply(t, id) {
+        replyMsg = { t, id };
+        document.getElementById('reply-text').innerText = "Ответ на: " + t.substring(0,25) + "...";
         document.getElementById('reply-preview').style.display = 'flex';
     }
     function cancelReply() { replyMsg = null; document.getElementById('reply-preview').style.display = 'none'; }
+    function toggleEmoji() { const p = document.getElementById('emoji-panel'); p.style.display = p.style.display === 'grid' ? 'none' : 'grid'; }
     
-    function likeMsg(id, current) { db.ref('messages/'+currentChat+'/'+id).update({ liked: !current }); }
-    function deleteMsg(id) { if(confirm("Удалить сообщение?")) db.ref('messages/'+currentChat+'/'+id).remove(); }
-    function clearChat() { if(confirm("Очистить весь чат?")) db.ref('messages/'+currentChat).remove(); }
-
-    /* ВСПОМОГАТЕЛЬНОЕ */
     function loadChatList() {
         db.ref('users').on('value', s => {
             const l = document.getElementById('chat-list'); l.innerHTML = "";
             s.forEach(u => {
                 if(u.key !== me.nick) {
-                    const user = u.val();
-                    l.innerHTML += `<div class="user-item" style="display:flex; align-items:center; padding:15px; gap:10px" onclick="openChat('${u.key}','${user.name}','${user.ava}')">
-                        <img src="${user.ava || 'https://via.placeholder.com/40'}" style="width:45px; height:45px; border-radius:50%"> <b>${user.name}</b>
+                    const d = u.val();
+                    l.innerHTML += `<div class="user-item" style="display:flex; align-items:center; padding:15px; gap:12px; cursor:pointer" onclick="openChat('${u.key}','${d.name}','${d.ava}')">
+                        <img src="${d.ava || 'https://via.placeholder.com/50'}" style="width:50px; height:50px; border-radius:50%; border:1px solid var(--accent)"> <b>${d.name}</b>
                     </div>`;
                 }
             });
         });
     }
 
-    function tab(t) { 
-        document.querySelectorAll('.tab-content, .nav-bar i').forEach(el => el.classList.remove('active')); 
-        document.getElementById('t-'+t).classList.add('active'); 
-        document.getElementById('n-'+t).classList.add('active'); 
+    async function upFile(input, type) {
+        const f = input.files[0]; if(!f) return;
+        const fd = new FormData(); fd.append("image", f);
+        const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {method:"POST", body:fd});
+        const d = await r.json();
+        if(d.success) {
+            if(type === 'ava') db.ref('users/'+me.nick).update({ava: d.data.url});
+            else { 
+                const s = await db.ref('users/'+me.nick+'/posts').once('value');
+                const p = s.val() || []; p.push(d.data.url);
+                db.ref('users/'+me.nick).update({posts: p});
+            }
+        }
     }
-    function toggleEmoji() { 
-        const b = document.getElementById('emoji-box'); 
-        b.style.display = b.style.display === 'grid' ? 'none' : 'grid'; 
+
+    function renderPosts(id, p) {
+        const g = document.getElementById(id); g.innerHTML = "";
+        if(p) p.slice().reverse().forEach(url => g.innerHTML += `<img src="${url}" class="post-img">`);
     }
+
+    function loadThemes() {
+        const box = document.getElementById('theme-grid');
+        const st = [{n:'Neon', p:'#00f2fe', s:'#7000ff'}, {n:'Toxic', p:'#adff2f', s:'#000'}, {n:'Vamp', p:'#ff0000', s:'#000'}, {n:'Gold', p:'#ffd700', s:'#222'}];
+        st.forEach(t => box.innerHTML += `<div style="background:linear-gradient(45deg, ${t.p}, ${t.s}); padding:15px; border-radius:12px; text-align:center; cursor:pointer" onclick="setTheme('${t.p}','${t.s}')">${t.n}</div>`);
+    }
+    function setTheme(p, s) { document.documentElement.style.setProperty('--accent', p); document.documentElement.style.setProperty('--gradient', `linear-gradient(45deg, ${p}, ${s})`); }
+    function tab(t) { document.querySelectorAll('.tab-content, .nav-bar i').forEach(el => el.classList.remove('active')); document.getElementById('t-'+t).classList.add('active'); document.getElementById('n-'+t).classList.add('active'); }
     function closeChat() { document.getElementById('chat-window').classList.remove('active'); }
+    function clearChat() { if(confirm("Очистить?")) db.ref('messages/'+currentChat).remove(); }
 </script>
 </body>
 </html>
