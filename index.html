@@ -3,74 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VERONAGRAM PRO</title>
+    <title>VERONAGRAM ULTIMATE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        :root { --accent: #5865f2; --bg: #0e1621; --panel: #17212b; --text: #fff; --sub: #708499; --danger: #ed4245; }
+        :root {
+            --accent: #5865f2; --bg: #0e1621; --panel: #17212b; --text: #fff; --sub: #708499; --danger: #ed4245;
+            --gradient: linear-gradient(135deg, #2b5278, #5865f2);
+        }
+        /* ТЕМЫ */
+        body.theme-pink { --accent: #f06292; --gradient: linear-gradient(135deg, #880e4f, #f06292); }
+        body.theme-green { --accent: #4caf50; --gradient: linear-gradient(135deg, #1b5e20, #4caf50); }
+        body.theme-mono { --accent: #ffffff; --gradient: linear-gradient(135deg, #333, #777); }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
         .screen { display: none; height: 100vh; width: 100%; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* ВХОД И РЕГИСТРАЦИЯ */
+        /* АВТОРИЗАЦИЯ */
         #login-screen { justify-content: center; align-items: center; background: radial-gradient(circle at top, #1e2a38, #0e1621); }
         .auth-card { width: 90%; max-width: 400px; background: var(--panel); padding: 40px 30px; border-radius: 28px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
         .auth-card input, .auth-card textarea { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1px solid transparent; background: var(--bg); color: #fff; outline: none; }
-        .auth-card input:focus { border-color: var(--accent); }
-        
+        .logo-box { font-size: 50px; color: #fff; margin-bottom: 10px; }
+
         /* ИНТЕРФЕЙС */
         .app-shell { display: flex; width: 100%; height: 100%; }
         .nav-bar { width: 70px; background: #080e16; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; }
         .nav-bar i { font-size: 22px; color: var(--sub); cursor: pointer; }
         .nav-bar i.active { color: var(--accent); }
 
-        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid rgba(0,0,0,0.2); }
+        .sidebar { width: 350px; background: var(--panel); border-right: 1px solid rgba(0,0,0,0.2); display: flex; flex-direction: column; }
         .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
         .tab-content.active { display: flex; }
-        .tab-header { padding: 20px 25px; font-size: 20px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .tab-header { padding: 20px 25px; font-size: 18px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
 
         /* ПРОФИЛЬ */
-        .profile-card { background: linear-gradient(135deg, #2b5278, #5865f2); margin: 15px; border-radius: 20px; padding: 30px 20px; text-align: center; }
-        .avatar-big { width: 70px; height: 70px; background: #fff; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: var(--accent); }
-        .info-block { background: var(--bg); margin: 0 15px 10px; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; }
+        .profile-card { background: var(--gradient); margin: 15px; border-radius: 20px; padding: 30px 20px; text-align: center; }
+        .avatar-box { width: 90px; height: 90px; background: #fff; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--accent); border: 4px solid rgba(255,255,255,0.3); }
+        .theme-btns { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .t-btn { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
+
+        /* ПОСТЫ */
+        .post { background: var(--bg); margin: 10px 15px; padding: 15px; border-radius: 12px; border-left: 4px solid var(--accent); }
 
         /* ЧАТ */
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #0e1621; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
         .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 75%; padding: 12px; border-radius: 15px; font-size: 14px; }
-        .msg.me { align-self: flex-end; background: #2b5278; border-bottom-right-radius: 2px; }
+        .msg { max-width: 75%; padding: 12px; border-radius: 15px; font-size: 14px; position: relative; }
+        .msg.me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 2px; }
         .msg.other { align-self: flex-start; background: #182533; border-bottom-left-radius: 2px; }
-        .msg b { font-size: 11px; color: var(--accent); display: block; margin-bottom: 4px; }
+        .msg b { font-size: 10px; opacity: 0.8; display: block; margin-bottom: 4px; }
 
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-        .btn-clear { background: transparent; color: var(--danger); border: none; cursor: pointer; font-size: 18px; }
-
-        .user-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .user-item:hover { background: rgba(255,255,255,0.03); }
-
+        .btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-weight: bold; cursor: pointer; }
+        .user-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        
         @media (max-width: 768px) { .sidebar { width: 100%; } .chat-main { display: none; } }
     </style>
 </head>
-<body>
+<body class="theme-default">
 
     <div id="login-screen" class="screen active">
         <div class="auth-card">
-            <h2 style="margin-bottom: 10px;">VERONAGRAM</h2>
-            <p id="auth-status" style="color: var(--sub); font-size: 13px; margin-bottom: 15px;">Регистрация или Вход</p>
-            <input type="text" id="auth-nick" placeholder="Никнейм">
-            <input type="password" id="auth-pass" placeholder="Пароль">
-            <div id="reg-fields">
-                <input type="text" id="reg-name" placeholder="Ваше Имя">
-                <input type="email" id="reg-email" placeholder="Почта">
-                <textarea id="reg-bio" placeholder="О себе..."></textarea>
+            <div class="logo-box"><i class="fas fa-crow"></i></div>
+            <h2>VERONAGRAM</h2>
+            <p id="auth-info" style="font-size: 12px; color: var(--sub); margin: 10px 0;">Вход или Регистрация</p>
+            <input type="text" id="a-nick" placeholder="Никнейм">
+            <input type="password" id="a-pass" placeholder="Пароль">
+            <div id="reg-ext">
+                <input type="text" id="a-name" placeholder="Ваше Имя">
+                <textarea id="a-bio" placeholder="О себе..."></textarea>
             </div>
-            <button class="btn" onclick="handleAuth()">ПРОДОЛЖИТЬ</button>
+            <button class="btn" onclick="auth()">ВОЙТИ / СОЗДАТЬ</button>
         </div>
     </div>
 
@@ -84,42 +91,48 @@
 
             <aside class="sidebar">
                 <div id="tab-chats" class="tab-content">
-                    <div class="tab-header">Чаты</div>
-                    <div id="chat-list" style="padding: 10px; color: var(--sub); font-size: 13px;">Ищите друзей в поиске...</div>
+                    <div class="tab-header">Сообщения</div>
+                    <div id="recent-chats" style="padding: 20px; color: var(--sub); font-size: 13px; text-align: center;">Нет активных диалогов</div>
                 </div>
 
                 <div id="tab-search" class="tab-content">
-                    <div class="tab-header">Поиск</div>
+                    <div class="tab-header">Поиск белых ворон</div>
                     <div style="padding:15px;">
-                        <input type="text" id="s-in" placeholder="Введите ник..." oninput="doSearch()" style="width:100%; padding:12px; background:var(--bg); border:none; border-radius:10px; color:#fff;">
-                        <div id="s-results" style="margin-top:10px;"></div>
+                        <input type="text" id="s-input" placeholder="Ник или имя..." oninput="search()" style="width:100%; padding:12px; background:var(--bg); border:none; border-radius:10px; color:#fff;">
+                        <div id="s-res"></div>
                     </div>
                 </div>
 
                 <div id="tab-profile" class="tab-content active">
-                    <div class="tab-header">Мой Профиль</div>
+                    <div class="tab-header">Профиль <i class="fas fa-cog" style="cursor:pointer;" onclick="logout()"></i></div>
                     <div class="profile-card">
-                        <div class="avatar-big"><i class="fas fa-user"></i></div>
-                        <h2 id="p-name">---</h2>
-                        <small id="p-nick" style="opacity:0.6;">@---</small>
+                        <div class="avatar-box"><i class="fas fa-crow"></i></div>
+                        <h2 id="u-name">---</h2>
+                        <p id="u-nick" style="opacity:0.6; font-size:14px;">@---</p>
+                        <div class="theme-btns">
+                            <div class="t-btn" style="background:#5865f2" onclick="setTheme('default')"></div>
+                            <div class="t-btn" style="background:#f06292" onclick="setTheme('pink')"></div>
+                            <div class="t-btn" style="background:#4caf50" onclick="setTheme('green')"></div>
+                            <div class="t-btn" style="background:#fff" onclick="setTheme('mono')"></div>
+                        </div>
                     </div>
-                    <div class="info-block"><i class="fas fa-envelope"></i><div><small style="color:var(--sub); display:block;">Почта</small><span id="p-email">---</span></div></div>
-                    <div class="info-block"><i class="fas fa-info-circle"></i><div><small style="color:var(--sub); display:block;">Био</small><span id="p-bio">---</span></div></div>
-                    <div style="padding:15px;"><button class="btn" style="background:var(--danger);" onclick="logout()">ВЫЙТИ</button></div>
+                    <div style="padding: 0 15px;">
+                        <textarea id="post-text" placeholder="Что нового?" style="width:100%; padding:12px; border-radius:12px; background:var(--panel); color:#fff; border:none; resize:none;"></textarea>
+                        <button class="btn" style="margin-top:10px; padding:10px;" onclick="addPost()">Опубликовать</button>
+                    </div>
+                    <div id="my-posts" style="margin-top:20px;"></div>
                 </div>
             </aside>
             
             <main class="chat-main">
                 <div class="tab-header">
-                    <span id="chat-title">Выберите чат</span>
-                    <button id="clear-btn" class="btn-clear" onclick="clearHistory()" style="display:none;" title="Очистить чат">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                    <span id="c-target">Выберите чат</span>
+                    <i class="fas fa-trash" id="del-chat" style="display:none; color:var(--danger); cursor:pointer;" onclick="clearChat()"></i>
                 </div>
                 <div class="messages" id="chat-box"></div>
-                <div id="input-area" style="padding:15px; background:var(--panel); display:none; gap:10px;">
-                    <input type="text" id="m-in" placeholder="Сообщение..." style="flex:1; background:var(--bg); border:none; padding:12px; border-radius:10px; color:#fff; outline:none;" onkeypress="if(event.key==='Enter') send()">
-                    <button class="btn" style="width:auto; padding:0 20px;" onclick="send()"><i class="fas fa-paper-plane"></i></button>
+                <div id="chat-controls" style="padding:15px; background:var(--panel); display:none; gap:10px;">
+                    <input type="text" id="m-text" placeholder="Сообщение..." style="flex:1; background:var(--bg); border:none; padding:12px; border-radius:10px; color:#fff; outline:none;" onkeypress="if(event.key==='Enter') sendMsg()">
+                    <button class="btn" style="width:auto; padding:0 20px;" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </main>
         </div>
@@ -138,87 +151,78 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let me = JSON.parse(localStorage.getItem('v-pro-user')) || null;
-        let activeChatID = null;
+        let me = JSON.parse(localStorage.getItem('v-user-last')) || null;
+        let activeID = null;
 
-        if(me) loginSuccess(me);
+        if(me) { 
+            setTheme(localStorage.getItem('v-theme') || 'default');
+            loginOk(me); 
+        }
 
-        // ЛОГИКА ВХОДА И ПАРОЛЯ
-        async function handleAuth() {
-            const nick = document.getElementById('auth-nick').value.toLowerCase().trim();
-            const pass = document.getElementById('auth-pass').value.trim();
-            if(!nick || !pass) return alert("Введите ник и пароль!");
+        async function auth() {
+            const nick = document.getElementById('a-nick').value.toLowerCase().trim();
+            const pass = document.getElementById('a-pass').value.trim();
+            if(!nick || !pass) return alert("Заполни ник и пароль!");
 
-            const userRef = db.ref('users/' + nick);
-            const snapshot = await userRef.once('value');
-            const data = snapshot.val();
+            const snap = await db.ref('users/' + nick).once('value');
+            const user = snap.val();
 
-            if(data) {
-                // Если юзер есть — проверяем пароль
-                if(data.pass === pass) {
-                    loginSuccess(data);
-                } else {
-                    alert("Неверный пароль для этого ника!");
-                }
+            if(user) {
+                if(user.pass === pass) loginOk(user);
+                else alert("Неверный пароль!");
             } else {
-                // Если юзера нет — регистрируем
-                const name = document.getElementById('reg-name').value;
-                if(!name) return alert("Для регистрации введите имя!");
-                const newUser = {
-                    nick, pass, name, 
-                    email: document.getElementById('reg-email').value,
-                    bio: document.getElementById('reg-bio').value
-                };
-                await userRef.set(newUser);
-                loginSuccess(newUser);
+                const name = document.getElementById('a-name').value;
+                if(!name) return alert("Для регистрации введи имя!");
+                const newUser = { nick, pass, name, bio: document.getElementById('a-bio').value };
+                await db.ref('users/' + nick).set(newUser);
+                loginOk(newUser);
             }
         }
 
-        function loginSuccess(userData) {
-            me = userData;
-            localStorage.setItem('v-pro-user', JSON.stringify(me));
+        function loginOk(data) {
+            me = data;
+            localStorage.setItem('v-user-last', JSON.stringify(me));
             document.getElementById('login-screen').classList.remove('active');
             document.getElementById('app-screen').classList.add('active');
-            document.getElementById('p-name').innerText = me.name;
-            document.getElementById('p-nick').innerText = '@' + me.nick;
-            document.getElementById('p-email').innerText = me.email || '---';
-            document.getElementById('p-bio').innerText = me.bio || '---';
+            document.getElementById('u-name').innerText = me.name;
+            document.getElementById('u-nick').innerText = '@' + me.nick;
+            loadPosts();
         }
 
-        // ПОИСК
-        function doSearch() {
-            const q = document.getElementById('s-in').value.toLowerCase();
-            const resDiv = document.getElementById('s-results');
-            resDiv.innerHTML = "";
+        function search() {
+            const q = document.getElementById('s-input').value.toLowerCase();
+            const res = document.getElementById('s-res'); res.innerHTML = "";
             if(q.length < 2) return;
 
-            db.ref('users').once('value', (snap) => {
-                const users = snap.val();
-                for(let n in users) {
+            db.ref('users').once('value', (s) => {
+                const all = s.val();
+                for(let n in all) {
                     if(n.includes(q) && n !== me.nick) {
                         const d = document.createElement('div');
                         d.className = "user-item";
-                        d.innerHTML = `<b>${users[n].name}</b><br><small>@${n}</small>`;
-                        d.onclick = () => openChat(users[n]);
-                        resDiv.appendChild(d);
+                        d.innerHTML = `<i class="fas fa-user-circle"></i> <b>${all[n].name}</b>`;
+                        d.onclick = () => openChat(all[n]);
+                        res.appendChild(d);
                     }
                 }
             });
         }
 
-        // ЧАТ И ОЧИСТКА
-        function openChat(user2) {
-            activeChatID = [me.nick, user2.nick].sort().join("_");
-            document.getElementById('chat-title').innerText = user2.name;
-            document.getElementById('input-area').style.display = "flex";
-            document.getElementById('clear-btn').style.display = "block";
+        // ГЛАВНАЯ ФУНКЦИЯ ЛИЧКИ
+        function openChat(partner) {
+            activeID = [me.nick, partner.nick].sort().join("_");
+            document.getElementById('c-target').innerText = partner.name;
+            document.getElementById('chat-controls').style.display = "flex";
+            document.getElementById('del-chat').style.display = "block";
             
-            db.ref('chats/' + activeChatID).on('value', (snap) => {
+            // Очищаем старый слушатель перед созданием нового
+            db.ref('chats/' + activeID).off(); 
+            db.ref('chats/' + activeID).on('value', (s) => {
                 const box = document.getElementById('chat-box');
                 box.innerHTML = "";
-                const msgs = snap.val();
+                const msgs = s.val();
                 if(!msgs) {
-                    box.innerHTML = "<div style='text-align:center;color:var(--sub);margin-top:20px;'>История пуста</div>";
+                    box.innerHTML = "<div style='text-align:center;color:var(--sub);margin-top:20px;'>Здесь пока пусто</div>";
                     return;
                 }
                 for(let id in msgs) {
@@ -232,18 +236,41 @@
             });
         }
 
-        function send() {
-            const val = document.getElementById('m-in').value.trim();
-            if(!val || !activeChatID) return;
-            db.ref('chats/' + activeChatID).push({ s: me.nick, t: val });
-            document.getElementById('m-in').value = "";
+        function sendMsg() {
+            const t = document.getElementById('m-text').value.trim();
+            if(!t || !activeID) return;
+            db.ref('chats/' + activeID).push({ s: me.nick, t: t });
+            document.getElementById('m-text').value = "";
         }
 
-        // КНОПКА ОЧИСТКИ
-        function clearHistory() {
-            if(confirm("Очистить всю переписку в этом чате?")) {
-                db.ref('chats/' + activeChatID).remove();
-            }
+        function clearChat() {
+            if(confirm("Удалить всю историю?")) db.ref('chats/' + activeID).remove();
+        }
+
+        function addPost() {
+            const t = document.getElementById('post-text').value.trim();
+            if(!t) return;
+            db.ref('posts/' + me.nick).push({ t, time: Date.now() });
+            document.getElementById('post-text').value = "";
+            loadPosts();
+        }
+
+        function loadPosts() {
+            db.ref('posts/' + me.nick).on('value', (s) => {
+                const pDiv = document.getElementById('my-posts'); pDiv.innerHTML = "";
+                const posts = s.val();
+                for(let id in posts) {
+                    const div = document.createElement('div');
+                    div.className = "post";
+                    div.innerHTML = posts[id].t;
+                    pDiv.prepend(div);
+                }
+            });
+        }
+
+        function setTheme(t) {
+            document.body.className = "theme-" + t;
+            localStorage.setItem('v-theme', t);
         }
 
         function switchTab(t, el) {
@@ -253,10 +280,7 @@
             el.classList.add('active');
         }
 
-        function logout() {
-            localStorage.clear();
-            location.reload();
-        }
+        function logout() { localStorage.clear(); location.reload(); }
     </script>
 </body>
 </html>
