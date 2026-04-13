@@ -3,107 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VERONA ULTRA VOID</title>
+    <title>VERONA ULTRA V24</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
-            --accent: #00f2fe;
-            --bg: #030508;
-            --panel: rgba(10, 13, 20, 0.8);
+            --accent: #00f2fe; --bg: #030508; --panel: rgba(10, 13, 20, 0.9);
             --neon: 0 0 15px var(--accent);
             --gradient: linear-gradient(135deg, var(--accent), #7000ff);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Consolas', monospace; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; height: 100vh; overflow: hidden; display: flex; }
+        #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.2; }
 
-        /* --- BACKGROUND ANIMATION --- */
-        #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.25; pointer-events: none; }
-
-        /* --- AUTH SYSTEM --- */
+        /* Авторизация */
         #auth-screen { position: fixed; inset: 0; background: #000; z-index: 100000; display: flex; align-items: center; justify-content: center; }
-        .auth-box { background: var(--panel); backdrop-filter: blur(20px); padding: 40px; border: 1px solid var(--accent); border-radius: 35px; box-shadow: var(--neon); width: 90%; max-width: 420px; text-align: center; }
-        .crow-logo { width: 100px; height: 100px; fill: #fff; filter: drop-shadow(var(--neon)); animation: pulse 2s infinite; margin-bottom: 20px; }
-        @keyframes pulse { 50% { transform: scale(1.1); opacity: 0.8; } }
+        .auth-box { background: var(--panel); backdrop-filter: blur(20px); padding: 40px; border: 1px solid var(--accent); border-radius: 30px; box-shadow: var(--neon); width: 90%; max-width: 400px; text-align: center; }
 
-        /* --- NAVIGATION --- */
-        .nav-sidebar { width: 80px; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 35px; border-right: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-sidebar i { font-size: 24px; color: #333; cursor: pointer; transition: 0.3s; }
-        .nav-sidebar i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
+        /* Навигация */
+        .nav { width: 80px; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 30px; border-right: 1px solid #111; z-index: 1000; }
+        .nav i { font-size: 22px; color: #444; cursor: pointer; transition: 0.3s; }
+        .nav i.active { color: var(--accent); text-shadow: var(--neon); }
 
-        /* --- SIDEBAR CONTENT --- */
-        .sidebar { width: 420px; background: var(--panel); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; position: relative; }
-        .tab-content { display: none; flex-direction: column; height: 100%; overflow: hidden; }
-        .tab-content.active { display: flex; }
+        /* Боковая панель */
+        .sidebar { width: 400px; background: var(--panel); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
+        .tab { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+        .tab.active { display: flex; }
 
-        /* STORIES */
-        .st-header { padding: 15px 20px 0; font-size: 11px; color: var(--accent); letter-spacing: 2px; font-weight: bold; }
-        .st-row { display: flex; gap: 15px; padding: 15px 20px; overflow-x: auto; scrollbar-width: none; }
-        .st-node { min-width: 68px; height: 68px; border-radius: 50%; background: var(--gradient); padding: 2px; flex-shrink: 0; cursor: pointer; }
-        .st-node img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
+        /* Сториз */
+        .st-row { display: flex; gap: 12px; padding: 15px; overflow-x: auto; scrollbar-width: none; }
+        .st-item { min-width: 65px; height: 65px; border-radius: 50%; background: var(--gradient); padding: 2px; flex-shrink: 0; cursor: pointer; }
+        .st-item img, .st-item video { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #000; object-fit: cover; }
 
-        /* LISTS */
-        .scroll-list { flex: 1; overflow-y: auto; padding-bottom: 80px; }
-        .node-item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
-        .node-item:hover { background: rgba(255,255,255,0.05); }
-        .node-item img { width: 55px; height: 55px; border-radius: 50%; border: 1px solid var(--accent); object-fit: cover; }
+        /* Список чатов */
+        .list { flex: 1; overflow-y: auto; }
+        .item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .item img { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--accent); }
 
-        /* --- CHAT WINDOW --- */
-        .chat-view { flex: 1; display: none; flex-direction: column; background: transparent; position: relative; z-index: 500; }
-        .chat-view.active { display: flex; }
-        .chat-head { height: 75px; background: var(--panel); backdrop-filter: blur(10px); display: flex; align-items: center; padding: 0 25px; gap: 15px; border-bottom: 1px solid var(--accent); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .msg-area { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-size: cover; background-position: center; }
+        /* Окно чата */
+        .chat { flex: 1; display: none; flex-direction: column; position: relative; z-index: 500; }
+        .chat.active { display: flex; }
+        .chat-head { height: 70px; background: var(--panel); backdrop-filter: blur(10px); display: flex; align-items: center; padding: 0 20px; gap: 15px; border-bottom: 1px solid var(--accent); }
+        .msg-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         
-        .msg { max-width: 75%; padding: 12px 18px; border-radius: 20px; font-size: 14px; line-height: 1.4; position: relative; word-wrap: break-word; }
-        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: bold; border-bottom-right-radius: 4px; box-shadow: var(--neon); }
-        .msg.other { align-self: flex-start; background: rgba(30, 40, 50, 0.95); border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
-        .msg-heart { position: absolute; bottom: -10px; right: 10px; background: #000; border: 1px solid var(--accent); border-radius: 12px; padding: 2px 8px; font-size: 11px; z-index: 10; }
+        /* Сообщения */
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 18px; position: relative; animation: pop 0.2s ease; font-size: 14px; }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } }
+        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: 500; border-bottom-right-radius: 2px; }
+        .msg.other { align-self: flex-start; background: #1a1d25; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        .reply-box-msg { background: rgba(0,0,0,0.2); padding: 5px 10px; border-left: 3px solid var(--accent); margin-bottom: 5px; font-size: 12px; border-radius: 4px; }
 
-        /* --- INPUTS & EMOJI --- */
-        .input-bar { padding: 20px 25px; background: var(--panel); backdrop-filter: blur(15px); display: flex; align-items: center; gap: 15px; position: relative; }
-        .field { flex: 1; background: rgba(0,0,0,0.6); border: 1px solid #333; padding: 14px 20px; border-radius: 15px; color: #fff; outline: none; transition: 0.3s; }
-        .field:focus { border-color: var(--accent); box-shadow: var(--neon); }
-        
-        .emoji-box { position: absolute; bottom: 90px; left: 25px; background: #0a0d14; border: 1px solid var(--accent); border-radius: 20px; padding: 15px; display: none; grid-template-columns: repeat(6, 1fr); gap: 10px; z-index: 2000; box-shadow: var(--neon); }
-        .emoji-box span { font-size: 24px; cursor: pointer; transition: 0.2s; }
-        .emoji-box span:hover { transform: scale(1.3); }
+        /* Ответ на сообщение (интерфейс) */
+        #reply-preview { background: #0a0d14; padding: 10px 20px; border-top: 1px solid var(--accent); display: none; align-items: center; justify-content: space-between; }
 
-        /* --- VOICE RECORDING UI --- */
-        #gs-overlay { position: absolute; inset: 0; background: #05070a; display: none; align-items: center; padding: 0 30px; z-index: 5000; }
-        .rec-blink { width: 14px; height: 14px; background: #ff0055; border-radius: 50%; margin-right: 15px; animation: blink 0.8s infinite; }
+        /* Ввод */
+        .input-bar { padding: 15px; background: var(--panel); display: flex; align-items: center; gap: 12px; }
+        .field { flex: 1; background: #000; border: 1px solid #333; padding: 12px 15px; border-radius: 12px; color: #fff; outline: none; }
+
+        /* Голосовые */
+        #gs-ui { position: absolute; inset: 0; background: #000; display: none; align-items: center; padding: 0 25px; z-index: 1000; }
+        .dot { width: 12px; height: 12px; background: #ff0055; border-radius: 50%; margin-right: 10px; animation: blink 0.8s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* --- MODALS & THEMES --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .theme-card { padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; border: 1px solid #222; font-weight: 900; transition: 0.3s; }
-        .theme-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        /* Модальные окна и профиль */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .prof-card { text-align: center; width: 100%; max-width: 500px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; width: 100%; margin-top: 20px; }
+        .grid-img { aspect-ratio: 1; width: 100%; object-fit: cover; cursor: pointer; }
 
-        /* --- PROFILE GRID --- */
-        .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; }
-        .p-item { aspect-ratio: 1; background: #111; position: relative; overflow: hidden; }
-        .p-item img { width: 100%; height: 100%; object-fit: cover; }
+        /* Зум фото */
+        #zoom-view { position: fixed; inset: 0; background: #000; z-index: 1000000; display: none; align-items: center; justify-content: center; }
+        #zoom-view img { max-width: 100%; max-height: 100%; transition: 0.3s; }
 
-        /* --- STORY VIEWER --- */
-        #story-viewer { position: fixed; inset: 0; background: #000; z-index: 1000000; display: none; flex-direction: column; }
-        .sv-progress { display: flex; gap: 5px; padding: 20px 10px; }
-        .sv-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.2); overflow: hidden; }
-        .sv-fill { width: 0%; height: 100%; background: #fff; transition: 5s linear; }
+        .btn { background: var(--gradient); border: none; padding: 12px; border-radius: 12px; color: #000; font-weight: bold; cursor: pointer; width: 100%; }
+        .back { font-size: 20px; color: var(--accent); cursor: pointer; }
 
-        /* --- UI ELEMENTS --- */
-        .btn { background: var(--gradient); border: none; padding: 14px; border-radius: 15px; color: #000; font-weight: 900; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn:active { transform: scale(0.96); }
-        .back-btn { font-size: 22px; color: var(--accent); cursor: pointer; margin-right: 10px; }
-
-        /* --- ADAPTIVE (MOBILE) --- */
-        @media (max-width: 800px) {
+        @media (max-width: 768px) {
             body { flex-direction: column; }
-            .nav-sidebar { width: 100%; height: 70px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; border: none; border-top: 1px solid #111; }
-            .sidebar { width: 100%; height: calc(100vh - 70px); }
-            .chat-view { position: fixed; inset: 0; z-index: 6000; background: #000; }
-            .input-bar { padding-bottom: 35px; }
+            .nav { width: 100%; height: 60px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; border: none; }
+            .sidebar { width: 100%; height: calc(100vh - 60px); }
+            .chat { position: fixed; inset: 0; z-index: 2000; background: #000; }
         }
     </style>
 </head>
@@ -113,342 +94,304 @@
 
 <div id="auth-screen">
     <div class="auth-box">
-        <svg class="crow-logo" viewBox="0 0 24 24"><path d="M21,12C21,16.5 17.5,20 13,20C12.5,20 12,20 11.5,19.9C14,18.5 15,15.5 15,13C15,10.5 14,8 11.5,6.1C12,6 12.5,6 13,6C17.5,6 21,9.5 21,12M6.1,13.2L3,11L6.1,8.8L9.2,11L6.1,13.2M11,11L13,12L11,13L10,15L9,13L7,12L9,11L10,9L11,11Z"/></svg>
-        <h1 style="color:var(--accent); letter-spacing:10px; margin-bottom:25px;">VERONA</h1>
-        <input type="text" id="auth-user" class="field" placeholder="USER_ID" style="text-align:center; margin-bottom:12px;">
-        <input type="password" id="auth-pass" class="field" placeholder="PASSWORD" style="text-align:center; margin-bottom:20px;">
-        <button class="btn" onclick="handleAuth()">ACCESS_DATA</button>
+        <h1 style="color:var(--accent); letter-spacing:5px; margin-bottom:20px;">VERONA V24</h1>
+        <input type="text" id="a-u" class="field" placeholder="ЛОГИН" style="text-align:center; margin-bottom:10px;">
+        <input type="password" id="a-p" class="field" placeholder="ПАРОЛЬ" style="text-align:center; margin-bottom:20px;">
+        <button class="btn" onclick="auth()">ВОЙТИ В СИСТЕМУ</button>
     </div>
 </div>
 
-<nav class="nav-sidebar">
-    <i class="fas fa-comment-alt active" id="n-chats" onclick="switchTab('chats')"></i>
-    <i class="fas fa-plus-square" onclick="showModal('create-modal')"></i>
-    <i class="fas fa-search" id="n-search" onclick="switchTab('search')"></i>
-    <i class="fas fa-palette" id="n-themes" onclick="switchTab('themes')"></i>
-    <i class="fas fa-user-circle" id="n-profile" onclick="switchTab('profile')"></i>
+<nav class="nav">
+    <i class="fas fa-comments active" onclick="tab('chats')"></i>
+    <i class="fas fa-search" onclick="tab('search')"></i>
+    <i class="fas fa-user-circle" onclick="tab('me')"></i>
+    <i class="fas fa-adjust" onclick="tab('themes')"></i>
 </nav>
 
 <aside class="sidebar">
-    <div id="t-chats" class="tab-content active">
-        <div class="st-header">ACTIVE_STORIES</div>
+    <div id="t-chats" class="tab active">
         <div class="st-row" id="st-row"></div>
-        <div class="scroll-list" id="chat-list"></div>
+        <div class="list" id="chat-list"></div>
     </div>
 
-    <div id="t-search" class="tab-content" style="padding:20px;">
-        <div style="display:flex; align-items:center; margin-bottom:20px;">
-            <i class="fas fa-arrow-left back-btn" onclick="switchTab('chats')"></i>
-            <input type="text" class="field" placeholder="Search ID..." oninput="searchUsers(this.value)">
-        </div>
-        <div id="search-results" class="scroll-list"></div>
+    <div id="t-search" class="tab" style="padding:20px;">
+        <input type="text" class="field" placeholder="Поиск по ID..." oninput="search(this.value)">
+        <div id="search-res" class="list"></div>
     </div>
 
-    <div id="t-themes" class="tab-content" style="padding:20px;">
-        <div style="display:flex; align-items:center; margin-bottom:20px;">
-            <i class="fas fa-arrow-left back-btn" onclick="switchTab('chats')"></i>
-            <h3>INTERFACE_MODS</h3>
-        </div>
-        <div id="theme-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
-    </div>
-
-    <div id="t-profile" class="tab-content">
-        <div style="padding:40px; text-align:center; background:rgba(255,255,255,0.02);">
-            <i class="fas fa-arrow-left back-btn" style="float:left" onclick="switchTab('chats')"></i><br>
-            <div style="position:relative; display:inline-block;">
-                <img id="my-ava" src="" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--accent); object-fit:cover;">
-                <label style="position:absolute; bottom:5px; right:5px; background:var(--accent); border-radius:50%; width:35px; height:35px; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fas fa-camera" style="color:#000"></i><input type="file" hidden onchange="uploadMedia(this,'ava')"></label>
-            </div>
-            <h2 id="my-name" style="margin:15px 0; color:var(--accent); letter-spacing:2px;"></h2>
+    <div id="t-me" class="tab">
+        <div style="padding:30px; text-align:center;">
+            <img id="my-ava" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--accent); object-fit:cover;">
+            <h2 id="my-name" style="margin:10px 0;"></h2>
             <div style="display:flex; gap:10px;">
-                <label class="btn" style="flex:1">POST <input type="file" hidden onchange="uploadMedia(this,'post')"></label>
-                <label class="btn" style="flex:1; background:#f05">STORY <input type="file" hidden onchange="uploadMedia(this,'story')"></label>
+                <label class="btn">ПОСТ <input type="file" hidden onchange="up(this,'post')"></label>
+                <label class="btn" style="background:#f05">СТОРИЗ <input type="file" hidden onchange="up(this,'story')"></label>
             </div>
         </div>
-        <div id="my-posts" class="p-grid"></div>
+        <div id="my-grid" class="grid"></div>
+    </div>
+
+    <div id="t-themes" class="tab" style="padding:20px;">
+        <h3>ЦВЕТ СИСТЕМЫ</h3><br>
+        <div id="theme-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
     </div>
 </aside>
 
-<main class="chat-view" id="chat-window">
+<main class="chat" id="chat-win">
     <div class="chat-head">
-        <i class="fas fa-arrow-left back-btn" onclick="closeChat()"></i>
-        <img id="chat-ava" src="" style="width:48px; height:48px; border-radius:50%; border:1px solid var(--accent);">
-        <b id="chat-title" style="flex:1; letter-spacing:1px;">NULL_CHANNEL</b>
-        <i class="fas fa-ellipsis-v" onclick="showModal('chat-settings')"></i>
+        <i class="fas fa-arrow-left back" onclick="closeChat()"></i>
+        <img id="c-ava" src="" style="width:45px; height:45px; border-radius:50%; cursor:pointer;" onclick="viewPeer()">
+        <b id="c-name" style="flex:1">ЧАТ</b>
     </div>
 
-    <div class="msg-area" id="msg-area"></div>
+    <div class="msg-box" id="msg-box"></div>
 
-    <div id="gs-overlay">
-        <div class="rec-blink"></div>
-        <span id="gs-timer" style="font-weight:bold;">00:00</span>
-        <span style="margin-left:auto; opacity:0.5; font-size:12px;"><<< SLIDE TO CANCEL</span>
+    <div id="reply-preview">
+        <div id="reply-text" style="font-size:12px; opacity:0.7"></div>
+        <i class="fas fa-times" onclick="cancelReply()"></i>
     </div>
 
-    <div class="emoji-box" id="emoji-box">
-        <span onclick="putEmoji('😂')">😂</span><span onclick="putEmoji('❤️')">❤️</span><span onclick="putEmoji('🔥')">🔥</span>
-        <span onclick="putEmoji('💀')">💀</span><span onclick="putEmoji('🤡')">🤡</span><span onclick="putEmoji('😎')">😎</span>
-        <span onclick="putEmoji('👍')">👍</span><span onclick="putEmoji('🤬')">🤬</span><span onclick="putEmoji('👀')">👀</span>
-        <span onclick="putEmoji('⚡')">⚡</span><span onclick="putEmoji('💎')">💎</span><span onclick="putEmoji('🔫')">🔫</span>
+    <div id="gs-ui">
+        <div class="dot"></div> <span id="gs-timer">00:00</span>
+        <span style="margin-left:auto; opacity:0.5; font-size:12px;">ОТМЕНА СВАЙПОМ ВЛЕВО</span>
     </div>
 
     <div class="input-bar">
-        <i class="far fa-smile" onclick="toggleEmojis()" style="font-size:24px; color:var(--accent); cursor:pointer;"></i>
-        <i class="fas fa-microphone" id="gs-btn" style="font-size:24px; color:var(--accent); cursor:pointer;"></i>
-        <input type="text" id="msg-input" class="field" placeholder="Transmit..." onkeypress="if(event.key==='Enter') sendMessage()">
-        <i class="fas fa-paper-plane" onclick="sendMessage()" style="font-size:24px; color:var(--accent); cursor:pointer;"></i>
+        <i class="fas fa-microphone" id="gs-btn" style="font-size:22px; color:var(--accent);"></i>
+        <input type="text" id="m-input" class="field" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') send()">
+        <i class="fas fa-paper-plane" onclick="send()" style="font-size:22px; color:var(--accent);"></i>
     </div>
 </main>
 
-<div id="story-viewer">
-    <div class="sv-progress" id="sv-progress"></div>
-    <div style="position:absolute; top:40px; right:25px; z-index:10; font-size:30px;" onclick="closeStories()"><i class="fas fa-times"></i></div>
-    <div id="sv-body" style="flex:1; display:flex; align-items:center; justify-content:center;" onclick="handleStoryTap(event)"></div>
-</div>
-
-<div id="create-modal" class="modal">
-    <div class="auth-box">
-        <h3>CREATE_OBJECT</h3><br>
-        <input type="text" id="new-obj-name" class="field" placeholder="Name..."><br><br>
-        <select id="new-obj-type" class="field"><option value="group">GROUP</option><option value="channel">CHANNEL</option></select><br><br>
-        <button class="btn" onclick="createObject()">CONFIRM</button>
-        <button class="btn" style="background:none; color:#fff; margin-top:10px" onclick="hideModal('create-modal')">CANCEL</button>
+<div id="prof-modal" class="modal">
+    <i class="fas fa-times" style="position:absolute; top:20px; right:20px; font-size:24px;" onclick="hideModal('prof-modal')"></i>
+    <div class="prof-card">
+        <img id="p-ava" src="" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--accent); object-fit:cover;">
+        <h2 id="p-name" style="margin:15px 0;"></h2>
+        <div id="p-grid" class="grid"></div>
     </div>
 </div>
 
-<div id="chat-settings" class="modal">
-    <div class="auth-box">
-        <h3>CHANNEL_MODS</h3><br>
-        <label class="btn">CHANGE_BG <input type="file" hidden onchange="uploadMedia(this,'bg')"></label><br><br>
-        <button class="btn" style="background:none; color:#fff; border:1px solid #333;" onclick="hideModal('chat-settings')">CLOSE</button>
-    </div>
+<div id="zoom-view" onclick="this.style.display='none'">
+    <img id="zoom-img" src="">
+</div>
+
+<div id="st-viewer" class="modal" onclick="closeSt()">
+    <div id="st-content" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
 </div>
 
 <script>
-    /* --- CONFIG & STATE --- */
-    const IMGBB_KEY = "a4feb69baa5d7a0b6e9d3f4f80ce72bd";
-    const firebaseConfig = { databaseURL: "https://veronagram-aafc1-default-rtdb.firebaseio.com" };
-    firebase.initializeApp(firebaseConfig);
+    const IMGBB = "a4feb69baa5d7a0b6e9d3f4f80ce72bd";
+    firebase.initializeApp({ databaseURL: "https://veronagram-aafc1-default-rtdb.firebaseio.com" });
     const db = firebase.database();
 
-    let user = JSON.parse(localStorage.getItem('verona-user')), currentRoom, roomPeer;
-    let recorder, audioChunks = [], gsTimerInterval, gsSeconds = 0, gsStartX, isRecording = false;
-    let storyList = [], storyIndex = 0, storyTimer;
+    let user = JSON.parse(localStorage.getItem('v24-user')), curChat, curPeer, replyTo = null;
+    let rec, chunks = [], vInt, vSec = 0, vStart;
 
-    /* --- MATRIX BACKGROUND --- */
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    const drops = Array(Math.floor(canvas.width / 18)).fill(1);
-    function drawMatrix() {
-        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "#00f2fe"; ctx.font = "15px monospace";
+    // Матрица
+    const c = document.getElementById('matrix'), x = c.getContext('2d');
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    const drops = Array(Math.floor(c.width/15)).fill(1);
+    setInterval(() => {
+        x.fillStyle = "rgba(0,0,0,0.05)"; x.fillRect(0,0,c.width,c.height);
+        x.fillStyle = "#00f2fe"; x.font = "15px monospace";
         drops.forEach((y, i) => {
-            const txt = String.fromCharCode(Math.random()*128);
-            ctx.fillText(txt, i*18, y*18);
-            if(y*18 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+            x.fillText(String.fromCharCode(Math.random()*128), i*15, y*15);
+            if(y*15 > c.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
         });
-    }
-    setInterval(drawMatrix, 50);
+    }, 50);
 
-    /* --- AUTHENTICATION --- */
-    if(user) startApp(user);
+    if(user) start(user);
 
-    async function handleAuth() {
-        const u = document.getElementById('auth-user').value.toLowerCase().trim();
-        const p = document.getElementById('auth-pass').value.trim();
+    async function auth() {
+        const u = document.getElementById('a-u').value.toLowerCase().trim();
+        const p = document.getElementById('a-p').value.trim();
         if(!u || !p) return;
-        const snap = await db.ref('users/'+u).once('value');
-        const data = snap.exists() ? snap.val() : { nick:u, pass:p, name:u, ava:"", posts:[], stories:[], bgs:{} };
-        if(snap.exists() && data.pass !== p) return alert("AUTH_ERROR: WRONG_PASSWORD");
-        if(!snap.exists()) await db.ref('users/'+u).set(data);
-        startApp(data);
+        const s = await db.ref('users/'+u).once('value');
+        const d = s.exists() ? s.val() : { nick:u, pass:p, name:u, ava:"", posts:[], stories:[] };
+        if(s.exists() && d.pass !== p) return alert("Неверный пароль");
+        if(!s.exists()) await db.ref('users/'+u).set(d);
+        start(d);
     }
 
-    function startApp(u) {
-        user = u; localStorage.setItem('verona-user', JSON.stringify(user));
+    function start(u) {
+        user = u; localStorage.setItem('v24-user', JSON.stringify(user));
         document.getElementById('auth-screen').style.display='none';
         db.ref('users/'+user.nick).on('value', s => { 
             user = s.val(); 
-            document.getElementById('my-name').innerText = user.name.toUpperCase();
-            document.getElementById('my-ava').src = user.ava || 'https://via.placeholder.com/120';
-            renderPosts();
+            document.getElementById('my-name').innerText = user.name;
+            document.getElementById('my-ava').src = user.ava || 'https://via.placeholder.com/100';
+            renderGrid('my-grid', user.posts, true);
         });
-        loadChats(); loadStories(); initThemes();
+        loadChats(); loadStories(); loadThemes();
     }
 
-    /* --- CHAT ENGINE --- */
-    function openChat(id, title, ava, type) {
-        currentRoom = type === 'private' ? [user.nick, id].sort().join("_") : id;
-        roomPeer = id;
-        document.getElementById('chat-title').innerText = title.toUpperCase();
-        document.getElementById('chat-ava').src = ava || 'https://via.placeholder.com/50';
-        document.getElementById('chat-window').classList.add('active');
+    /* ЧАТ И ОТВЕТЫ */
+    function openChat(id, name, ava) {
+        curChat = [user.nick, id].sort().join("_"); curPeer = id;
+        document.getElementById('c-name').innerText = name;
+        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/50';
+        document.getElementById('chat-win').classList.add('active');
 
-        // Load custom BG
-        db.ref(`users/${user.nick}/bgs/${currentRoom}`).on('value', s => {
-            document.getElementById('msg-area').style.backgroundImage = s.exists() ? `url(${s.val()})` : 'none';
-        });
-
-        db.ref('messages/'+currentRoom).on('value', s => {
-            const area = document.getElementById('msg-area'); area.innerHTML = "";
+        db.ref('messages/'+curChat).on('value', s => {
+            const box = document.getElementById('msg-box'); box.innerHTML = "";
             s.forEach(m => {
                 const v = m.val();
                 const d = document.createElement('div');
                 d.className = `msg ${v.s === user.nick ? 'me' : 'other'}`;
-                if(v.type === 'voice') d.innerHTML = `<audio src="${v.t}" controls style="width:210px; height:40px; filter:invert(1) hue-rotate(180deg)"></audio>`;
-                else d.innerText = v.t;
-                if(v.like) d.innerHTML += `<span class="msg-heart">❤️</span>`;
-                
-                d.ondblclick = () => db.ref(`messages/${currentRoom}/${m.key}`).update({like: !v.like});
-                d.oncontextmenu = (e) => { e.preventDefault(); if(confirm("PURGE_MESSAGE?")) db.ref(`messages/${currentRoom}/${m.key}`).remove(); };
-                area.appendChild(d);
+                let h = "";
+                if(v.reply) h += `<div class="reply-box-msg">${v.reply}</div>`;
+                if(v.type==='voice') h += `<audio src="${v.t}" controls style="width:200px; filter:invert(1)"></audio>`;
+                else h += `<div>${v.t}</div>`;
+                if(v.like) h += `<span style="font-size:10px; position:absolute; bottom:-5px; right:5px;">❤️</span>`;
+                d.innerHTML = h;
+
+                d.onclick = () => { replyTo = v.t.substring(0, 30); document.getElementById('reply-text').innerText = "Ответ на: " + replyTo; document.getElementById('reply-preview').style.display='flex'; };
+                d.ondblclick = () => db.ref(`messages/${curChat}/${m.key}`).update({like: !v.like});
+                box.appendChild(d);
             });
-            area.scrollTop = area.scrollHeight;
+            box.scrollTop = box.scrollHeight;
         });
     }
 
-    function sendMessage() {
-        const t = document.getElementById('msg-input').value.trim(); if(!t) return;
-        db.ref('messages/'+currentRoom).push({s:user.nick, t, time:Date.now()});
-        document.getElementById('msg-input').value = "";
+    function send() {
+        const t = document.getElementById('m-input').value.trim(); if(!t) return;
+        db.ref('messages/'+curChat).push({s:user.nick, t, reply: replyTo, time:Date.now()});
+        cancelReply(); document.getElementById('m-input').value = "";
     }
 
-    /* --- TELEGRAM GS LOGIC (FIXED) --- */
-    const gsBtn = document.getElementById('gs-btn');
-    gsBtn.onmousedown = startGS; window.onmouseup = stopGS;
-    gsBtn.ontouchstart = (e) => { e.preventDefault(); gsStartX = e.touches[0].clientX; startGS(); };
-    gsBtn.ontouchend = stopGS;
-    gsBtn.ontouchmove = (e) => { if(isRecording && gsStartX - e.touches[0].clientX > 80) { audioChunks = []; stopGS(); } };
+    function cancelReply() { replyTo = null; document.getElementById('reply-preview').style.display='none'; }
 
-    async function startGS() {
-        if(isRecording) return;
+    /* ПРОФИЛЬ СОБЕСЕДНИКА */
+    async function viewPeer() {
+        const s = await db.ref('users/'+curPeer).once('value');
+        const d = s.val();
+        document.getElementById('p-name').innerText = d.name;
+        document.getElementById('p-ava').src = d.ava || 'https://via.placeholder.com/100';
+        renderGrid('p-grid', d.posts, false, curPeer);
+        document.getElementById('prof-modal').style.display = 'flex';
+    }
+
+    function renderGrid(target, posts, isMine, owner) {
+        const g = document.getElementById(target); g.innerHTML = "";
+        if(!posts) return;
+        posts.slice().reverse().forEach((p, i) => {
+            const img = document.createElement('img');
+            img.className = 'grid-img'; img.src = p.url;
+            img.onclick = () => { 
+                document.getElementById('zoom-img').src = p.url;
+                document.getElementById('zoom-view').style.display='flex';
+            };
+            // Лайки на фото в чужом профиле
+            if(!isMine) {
+                img.oncontextmenu = (e) => {
+                    e.preventDefault();
+                    alert("Вы лайкнули фото!");
+                    db.ref(`users/${owner}/posts/${posts.length-1-i}`).update({likes: (p.likes||0)+1});
+                };
+            }
+            g.appendChild(img);
+        });
+    }
+
+    /* ГОЛОСОВЫЕ (ТГ СТАЙЛ) */
+    const gbtn = document.getElementById('gs-btn');
+    gbtn.onmousedown = vS; window.onmouseup = vE;
+    gbtn.ontouchstart = (e) => { e.preventDefault(); vStart = e.touches[0].clientX; vS(); };
+    gbtn.ontouchend = vE;
+    gbtn.ontouchmove = (e) => { if(vStart - e.touches[0].clientX > 80) { chunks = []; vE(); } };
+
+    async function vS() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recorder = new MediaRecorder(stream); audioChunks = []; isRecording = true;
-        recorder.ondataavailable = e => audioChunks.push(e.data);
-        recorder.onstop = () => {
-            if(audioChunks.length > 0) {
-                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        rec = new MediaRecorder(stream); chunks = [];
+        rec.ondataavailable = e => chunks.push(e.data);
+        rec.onstop = () => {
+            if(chunks.length > 0) {
+                const blob = new Blob(chunks, { type: 'audio/webm' });
                 const reader = new FileReader(); reader.readAsDataURL(blob);
-                reader.onloadend = () => db.ref('messages/'+currentRoom).push({s:user.nick, t:reader.result, type:'voice'});
+                reader.onloadend = () => db.ref('messages/'+curChat).push({s:user.nick, t:reader.result, type:'voice'});
             }
         };
-        recorder.start();
-        document.getElementById('gs-overlay').style.display = 'flex';
-        gsSeconds = 0; gsTimerInterval = setInterval(() => { gsSeconds++; document.getElementById('gs-timer').innerText = new Date(gsSeconds*1000).toISOString().substr(14,5); }, 1000);
+        rec.start(); document.getElementById('gs-ui').style.display='flex';
+        vSec = 0; vInt = setInterval(() => { vSec++; document.getElementById('gs-timer').innerText = new Date(vSec*1000).toISOString().substr(14,5); }, 1000);
     }
-    function stopGS() { if(!isRecording) return; isRecording = false; clearInterval(gsTimerInterval); if(recorder) recorder.stop(); document.getElementById('gs-overlay').style.display = 'none'; }
+    function vE() { clearInterval(vInt); if(rec) rec.stop(); document.getElementById('gs-ui').style.display='none'; }
 
-    /* --- MEDIA & UPLOADS --- */
-    async function uploadMedia(input, type) {
-        const file = input.files[0]; if(!file) return;
-        const fd = new FormData(); fd.append("image", file);
-        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {method:"POST", body:fd});
-        const data = await res.json();
-        if(data.success) {
-            const url = data.data.url;
-            if(type === 'post') {
-                const posts = user.posts || []; posts.push({url, id:Date.now()});
-                db.ref('users/'+user.nick).update({posts});
-            } else if(type === 'story') {
-                const stories = user.stories || []; stories.push({url, id:Date.now()});
-                db.ref('users/'+user.nick).update({stories});
-            } else if(type === 'ava') {
-                db.ref('users/'+user.nick).update({ava:url});
-            } else if(type === 'bg') {
-                db.ref(`users/${user.nick}/bgs/${currentRoom}`).set(url);
-                hideModal('chat-settings');
+    /* МЕДИА */
+    async function up(input, type) {
+        const f = input.files[0]; if(!f) return;
+        const fd = new FormData(); fd.append("image", f);
+        const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB}`, {method:"POST", body:fd});
+        const d = await r.json();
+        if(d.success) {
+            const url = d.data.url;
+            const ref = db.ref('users/'+user.nick);
+            if(type==='post') { const p = user.posts||[]; p.push({url, likes:0}); ref.update({posts:p}); }
+            if(type==='story') { 
+                const s = user.stories||[]; 
+                // Проверка на видео (ImgBB только фото, для видео в реальности нужен другой хостинг, но здесь эмулируем)
+                s.push({url, type: f.type.includes('video') ? 'video' : 'img'}); 
+                ref.update({stories:s}); 
             }
         }
     }
 
-    /* --- STORIES SYSTEM --- */
     function loadStories() {
         db.ref('users').on('value', s => {
-            const row = document.getElementById('st-row'); row.innerHTML = "";
+            const r = document.getElementById('st-row'); r.innerHTML = "";
             s.forEach(u => {
                 const d = u.val();
-                if(d.stories && d.stories.length > 0) row.innerHTML += `<div class="st-node" onclick="viewStories('${u.key}')"><img src="${d.stories[d.stories.length-1].url}"></div>`;
+                if(d.stories && d.stories.length > 0) {
+                    const item = document.createElement('div'); item.className='st-item';
+                    item.innerHTML = `<img src="${d.stories[d.stories.length-1].url}">`;
+                    item.onclick = () => {
+                        const last = d.stories[d.stories.length-1];
+                        const box = document.getElementById('st-content');
+                        box.innerHTML = last.type === 'video' ? `<video src="${last.url}" autoplay controls style="max-width:100%"></video>` : `<img src="${last.url}" style="max-width:100%">`;
+                        document.getElementById('st-viewer').style.display='flex';
+                    };
+                    r.appendChild(item);
+                }
             });
         });
     }
-    async function viewStories(nick) {
-        const snap = await db.ref('users/'+nick+'/stories').once('value');
-        storyList = snap.val() || []; storyIndex = 0;
-        document.getElementById('story-viewer').style.display = 'flex';
-        renderStory();
-    }
-    function renderStory() {
-        clearTimeout(storyTimer);
-        const prog = document.getElementById('sv-progress');
-        prog.innerHTML = storyList.map((_,i) => `<div class="sv-bar"><div id="fill-${i}" class="sv-fill"></div></div>`).join('');
-        document.getElementById('sv-body').innerHTML = `<img src="${storyList[storyIndex].url}" style="max-width:100%; max-height:100%; object-fit:contain">`;
-        setTimeout(() => { if(document.getElementById('fill-'+storyIndex)) document.getElementById('fill-'+storyIndex).style.width = '100%'; }, 50);
-        storyTimer = setTimeout(() => { if(storyIndex < storyList.length-1) { storyIndex++; renderStory(); } else closeStories(); }, 5000);
-    }
-    function handleStoryTap(e) { if(e.clientX > window.innerWidth/2) { if(storyIndex < storyList.length-1) { storyIndex++; renderStory(); } else closeStories(); } else if(storyIndex > 0) { storyIndex--; renderStory(); } }
-    function closeStories() { clearTimeout(storyTimer); document.getElementById('story-viewer').style.display='none'; }
 
-    /* --- THEMES (10 MODS) --- */
-    function initThemes() {
-        const themes = [
-            {n:'VOID', a:'#00f2fe'}, {n:'TOXIC', a:'#adff2f'}, {n:'LAVA', a:'#ff4500'}, {n:'NEON', a:'#ff00ff'},
-            {n:'GOLD', a:'#ffd700'}, {n:'RUBY', a:'#ff0055'}, {n:'MINT', a:'#00ffaa'}, {n:'SKY', a:'#00d2ff'},
-            {n:'SNOW', a:'#ffffff'}, {n:'CHERRY', a:'#722f37'}
-        ];
-        const grid = document.getElementById('theme-grid'); grid.innerHTML = "";
-        themes.forEach(t => {
-            const card = document.createElement('div'); card.className = 'theme-card'; card.style.color = t.a; card.style.borderColor = t.a; card.innerText = t.n;
-            card.onclick = () => { document.documentElement.style.setProperty('--accent', t.a); };
-            grid.appendChild(card);
-        });
-    }
-
-    /* --- LISTS & SEARCH --- */
     function loadChats() {
-        db.ref('links/'+user.nick).on('value', s => {
-            const list = document.getElementById('chat-list'); list.innerHTML = "";
-            s.forEach(f => {
-                const d = f.val();
-                list.innerHTML += `<div class="node-item" onclick="openChat('${f.key}','${d.name}','${d.ava}','${d.type||'private'}')"><img src="${d.ava||'https://via.placeholder.com/50'}"> <div><b>${d.name.toUpperCase()}</b><br><span style="font-size:10px; opacity:0.4">${d.type||'PRIVATE_LINK'}</span></div></div>`;
+        db.ref('users').on('value', s => {
+            const l = document.getElementById('chat-list'); l.innerHTML = "";
+            s.forEach(u => {
+                if(u.key !== user.nick) {
+                    l.innerHTML += `<div class="item" onclick="openChat('${u.key}','${u.val().name}','${u.val().ava}')"><img src="${u.val().ava || 'https://via.placeholder.com/50'}"> <b>${u.val().name}</b></div>`;
+                }
             });
         });
     }
 
-    function searchUsers(q) {
+    function loadThemes() {
+        const colors = ['#00f2fe', '#adff2f', '#ff4500', '#ff00ff', '#ffffff'];
+        const g = document.getElementById('theme-grid');
+        colors.forEach(c => {
+            const d = document.createElement('div'); d.style.background = c; d.style.height='40px'; d.style.borderRadius='8px'; d.onclick = () => document.documentElement.style.setProperty('--accent', c);
+            g.appendChild(d);
+        });
+    }
+
+    function search(q) {
         if(!q) return;
         db.ref('users').once('value', s => {
             let h = "";
-            s.forEach(u => { if(u.key.includes(q.toLowerCase())) h += `<div class="node-item" onclick="addLink('${u.key}','${u.val().name}','${u.val().ava}')">ESTABLISH_LINK: ${u.val().name}</div>`; });
-            document.getElementById('search-results').innerHTML = h;
+            s.forEach(u => { if(u.key.includes(q.toLowerCase())) h += `<div class="item" onclick="openChat('${u.key}','${u.val().name}','${u.val().ava}')">${u.val().name}</div>`; });
+            document.getElementById('search-res').innerHTML = h;
         });
     }
 
-    async function addLink(nick, name, ava) { await db.ref(`links/${user.nick}/${nick}`).set({name, ava, type:'private'}); switchTab('chats'); }
-    async function createObject() {
-        const name = document.getElementById('new-obj-name').value; if(!name) return;
-        const id = 'obj_' + Date.now(); const type = document.getElementById('new-obj-type').value;
-        await db.ref('objects/'+id).set({name, type, creator:user.nick});
-        await db.ref(`links/${user.nick}/${id}`).set({name, type});
-        hideModal('create-modal');
+    function tab(t) { 
+        document.querySelectorAll('.tab, .nav i').forEach(x => x.classList.remove('active'));
+        document.getElementById('t-'+t).classList.add('active');
     }
-
-    function renderPosts() {
-        const g = document.getElementById('my-posts'); g.innerHTML = "";
-        if(user.posts) user.posts.slice().reverse().forEach(p => { g.innerHTML += `<div class="p-item" onclick="if(confirm('PURGE_POST?')) db.ref('users/'+user.nick).update({posts: user.posts.filter(x=>x.id!==p.id)})"><img src="${p.url}"></div>`; });
-    }
-
-    /* --- UI HELPERS --- */
-    function switchTab(t) {
-        document.querySelectorAll('.tab-content, .nav-sidebar i').forEach(x => { x.classList.remove('active'); if(x.id === 'n-'+t) x.classList.add('active'); if(x.className.includes('tab-content')) x.style.display='none'; });
-        document.getElementById('t-'+t).style.display = 'flex';
-    }
-    function closeChat() { document.getElementById('chat-window').classList.remove('active'); }
-    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function hideModal(id) { document.getElementById(id).style.display = 'none'; }
-    function toggleEmojis() { const e = document.getElementById('emoji-box'); e.style.display = e.style.display === 'grid' ? 'none' : 'grid'; }
-    function putEmoji(sm) { document.getElementById('msg-input').value += sm; toggleEmojis(); }
+    function closeChat() { document.getElementById('chat-win').classList.remove('active'); }
+    function hideModal(id) { document.getElementById(id).style.display='none'; }
+    function closeSt() { document.getElementById('st-viewer').style.display='none'; document.getElementById('st-content').innerHTML=""; }
 </script>
 </body>
 </html>
