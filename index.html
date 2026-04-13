@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VERONA V20 ELITE</title>
+    <title>VERONA V22 OVERLORD</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,137 +14,181 @@
             --neon: 0 0 15px var(--accent);
             --gradient: linear-gradient(135deg, var(--accent), #7000ff);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', monospace; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; transition: 0.5s; }
 
-        /* --- HACKER AUTH ANIMATION --- */
-        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 100000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #matrix-canvas { position: absolute; top: 0; left: 0; opacity: 0.3; }
-        .auth-card { position: relative; z-index: 10; background: rgba(10,13,20,0.9); padding: 40px; border: 1px solid var(--accent); border-radius: 20px; box-shadow: var(--neon); width: 90%; max-width: 400px; text-align: center; }
+        /* --- AUTH & MATRIX --- */
+        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 100000; display: flex; align-items: center; justify-content: center; }
+        #matrix { position: absolute; inset: 0; opacity: 0.2; }
+        .auth-card { position: relative; z-index: 10; background: rgba(10,13,20,0.95); padding: 40px; border: 1px solid var(--accent); border-radius: 30px; box-shadow: var(--neon); width: 90%; max-width: 400px; text-align: center; }
+        .crow-svg { width: 100px; height: 100px; fill: #fff; filter: drop-shadow(var(--neon)); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+
+        /* --- NAVIGATION --- */
+        .nav-side { width: 80px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 35px; border-right: 1px solid #111; z-index: 1000; }
+        .nav-side i { font-size: 24px; color: #222; cursor: pointer; transition: 0.3s; }
+        .nav-side i.active { color: var(--accent); text-shadow: var(--neon); transform: scale(1.2); }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 400px; background: var(--panel); border-right: 1px solid #111; display: flex; flex-direction: column; position: relative; }
+        .tab-content { display: none; flex-direction: column; height: 100%; overflow-y: auto; }
+        .tab-content.active { display: flex; }
+
+        /* --- STORIES --- */
+        .st-header { padding: 15px 20px 5px; font-size: 10px; color: var(--accent); letter-spacing: 2px; }
+        .st-row { display: flex; gap: 12px; padding: 10px 20px 20px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid #1a1a1a; }
+        .st-item { min-width: 65px; height: 65px; border-radius: 50%; background: var(--gradient); padding: 2px; cursor: pointer; flex-shrink: 0; }
+        .st-item img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #000; }
+
+        /* --- CHAT LIST --- */
+        .chat-item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #0d1117; transition: 0.2s; }
+        .chat-item:hover { background: rgba(255,255,255,0.03); }
+        .chat-item img { width: 55px; height: 55px; border-radius: 50%; border: 1px solid var(--accent); }
+
+        /* --- CHAT WINDOW --- */
+        .chat-win { flex: 1; display: none; flex-direction: column; background: #05070a; position: relative; z-index: 2000; }
+        .chat-win.active { display: flex; }
+        .chat-header { height: 70px; padding: 0 25px; background: rgba(10,13,20,0.98); display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--accent); box-shadow: 0 4px 20px #000; }
+        .msg-box { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-size: cover; background-position: center; }
         
-        .crow-anim { width: 120px; height: 120px; margin: 0 auto 20px; fill: #fff; filter: drop-shadow(var(--neon)); animation: fly 3s ease-in-out infinite; }
-        @keyframes fly { 0%, 100% { transform: translateY(0) rotate(5deg); } 50% { transform: translateY(-15px) rotate(-5deg); } }
-
-        /* --- UI COMPONENTS --- */
-        .sidebar { width: 400px; background: var(--panel); border-right: 1px solid #111; display: flex; flex-direction: column; z-index: 100; }
-        .nav-bar { width: 80px; background: #000; display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 30px; border-right: 1px solid #111; }
-        .nav-bar i { font-size: 22px; color: #333; cursor: pointer; transition: 0.3s; }
-        .nav-bar i.active { color: var(--accent); text-shadow: var(--neon); }
-
-        /* --- STORIES TOP --- */
-        .stories-container { padding: 15px; border-bottom: 1px solid #1a1a1a; }
-        .stories-row { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
-        .story-node { min-width: 65px; height: 65px; border-radius: 50%; background: var(--gradient); padding: 2px; cursor: pointer; flex-shrink: 0; }
-        .story-node img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #000; }
-
-        /* --- CHAT ENGINE --- */
-        .chat-main { flex: 1; display: none; flex-direction: column; background: #05070a; position: relative; }
-        .chat-main.active { display: flex; }
-        .chat-header { height: 65px; padding: 0 20px; background: rgba(10,13,20,0.95); display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .msg-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-size: cover; background-position: center; }
-        
-        .msg { max-width: 75%; padding: 12px 16px; border-radius: 20px; position: relative; font-size: 14px; line-height: 1.4; transition: 0.2s; }
-        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: bold; border-bottom-right-radius: 4px; }
+        .msg { max-width: 70%; padding: 12px 18px; border-radius: 20px; position: relative; font-size: 14px; line-height: 1.5; cursor: pointer; }
+        .msg.me { align-self: flex-end; background: var(--gradient); color: #000; font-weight: bold; border-bottom-right-radius: 4px; box-shadow: var(--neon); }
         .msg.other { align-self: flex-start; background: #1b2129; border-bottom-left-radius: 4px; }
-        .msg-like { position: absolute; bottom: -10px; right: 10px; font-size: 12px; background: #000; border: 1px solid var(--accent); border-radius: 10px; padding: 2px 6px; }
+        .msg-heart { position: absolute; bottom: -10px; right: 10px; background: #000; border: 1px solid var(--accent); border-radius: 10px; padding: 2px 6px; font-size: 11px; }
 
-        /* --- INPUT AREA --- */
-        .input-area { padding: 15px; background: #0a0d14; display: flex; align-items: center; gap: 15px; border-top: 1px solid #1a1a1a; }
-        .input { background: rgba(0,0,0,0.5); border: 1px solid #222; padding: 12px; border-radius: 12px; color: #fff; width: 100%; outline: none; }
-        .input:focus { border-color: var(--accent); box-shadow: var(--neon); }
+        /* --- INPUT & EMOJI --- */
+        .input-area { padding: 15px 25px; background: #0a0d14; display: flex; align-items: center; gap: 15px; border-top: 1px solid #1a1a1a; }
+        .input-main { background: #000; border: 1px solid #222; padding: 12px 20px; border-radius: 15px; color: #fff; width: 100%; outline: none; }
+        .emoji-panel { position: absolute; bottom: 85px; left: 25px; background: #111; border: 1px solid var(--accent); border-radius: 15px; padding: 15px; display: none; grid-template-columns: repeat(6, 1fr); gap: 12px; z-index: 3000; box-shadow: var(--neon); }
+        .emoji-panel span { font-size: 22px; cursor: pointer; transition: 0.2s; }
+        .emoji-panel span:hover { transform: scale(1.3); }
 
-        /* --- MOBILE --- */
+        /* --- VOICE RECORD --- */
+        .v-overlay { position: absolute; inset: 0; background: var(--panel); display: none; align-items: center; padding: 0 30px; z-index: 4000; }
+        .v-rec-dot { width: 12px; height: 12px; background: red; border-radius: 50%; margin-right: 15px; animation: blink 0.8s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- THEMES --- */
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; }
+        .theme-card { padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #222; font-weight: bold; }
+
+        /* --- MOBILE ADAPTIVE --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .nav-bar { width: 100%; height: 70px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; border: none; border-top: 1px solid #111; z-index: 1000; }
+            .nav-side { width: 100%; height: 70px; flex-direction: row; justify-content: space-around; position: fixed; bottom: 0; border: none; border-top: 1px solid #111; }
             .sidebar { width: 100%; height: calc(100vh - 70px); }
-            .chat-main { position: fixed; inset: 0; z-index: 2000; }
-            .input-area { padding-bottom: 30px; }
+            .chat-win { position: fixed; inset: 0; z-index: 5000; }
+            .input-area { padding-bottom: 35px; }
         }
 
-        /* --- MODALS --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; }
-        .modal-card { background: var(--panel); padding: 30px; border-radius: 25px; border: 1px solid var(--accent); width: 90%; max-width: 350px; text-align: center; }
+        .btn { background: var(--gradient); border: none; padding: 12px; border-radius: 12px; color: #000; font-weight: 900; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
+<div id="sv-modal" style="position:fixed; inset:0; background:#000; z-index:1000000; display:none; flex-direction:column;">
+    <div id="sv-progress" style="display:flex; gap:5px; padding:15px 10px;"></div>
+    <div style="position:absolute; top:40px; right:25px; z-index:10; font-size:30px;" onclick="closeS()"><i class="fas fa-times"></i></div>
+    <div id="sv-body" style="flex:1; display:flex; align-items:center; justify-content:center;" onclick="tapS(event)"></div>
+</div>
+
 <div id="auth-screen">
-    <canvas id="matrix-canvas"></canvas>
+    <canvas id="matrix"></canvas>
     <div class="auth-card">
-        <svg class="crow-anim" viewBox="0 0 24 24">
-            <path d="M21,12C21,16.5 17.5,20 13,20C12.5,20 12,20 11.5,19.9C14,18.5 15,15.5 15,13C15,10.5 14,8 11.5,6.1C12,6 12.5,6 13,6C17.5,6 21,9.5 21,12M6.1,13.2L3,11L6.1,8.8L9.2,11L6.1,13.2M11,11L13,12L11,13L10,15L9,13L7,12L9,11L10,9L11,11Z"/>
-        </svg>
-        <h2 style="color:var(--accent); letter-spacing:8px; margin-bottom:20px;">VERONA_OS</h2>
-        <input type="text" id="a-nick" class="input" placeholder="ACCESS_ID" style="text-align:center;"><br><br>
-        <button class="btn" style="width:100%" onclick="login()">INITIALIZE</button>
+        <svg class="crow-svg" viewBox="0 0 24 24"><path d="M21,12C21,16.5 17.5,20 13,20C12.5,20 12,20 11.5,19.9C14,18.5 15,15.5 15,13C15,10.5 14,8 11.5,6.1C12,6 12.5,6 13,6C17.5,6 21,9.5 21,12M6.1,13.2L3,11L6.1,8.8L9.2,11L6.1,13.2M11,11L13,12L11,13L10,15L9,13L7,12L9,11L10,9L11,11Z"/></svg>
+        <h1 style="color:var(--accent); letter-spacing:10px; margin-bottom:25px;">VERONA</h1>
+        <input type="text" id="a-user" class="input-main" placeholder="SYSTEM_ID" style="text-align:center; margin-bottom:10px;">
+        <input type="password" id="a-pass" class="input-main" placeholder="PASSWORD" style="text-align:center; margin-bottom:20px;">
+        <button class="btn" onclick="auth()">ACCESS_GRANTED</button>
     </div>
 </div>
 
-<nav class="nav-bar">
+<nav class="nav-side">
     <i class="fas fa-terminal active" onclick="tab('chats')" id="n-chats"></i>
-    <i class="fas fa-satellite-dish" onclick="tab('search')" id="n-search"></i>
-    <i class="fas fa-user-shield" onclick="tab('prof')" id="n-prof"></i>
+    <i class="fas fa-search" onclick="tab('search')" id="n-search"></i>
+    <i class="fas fa-plus-circle" onclick="document.getElementById('create-modal').style.display='flex'"></i>
+    <i class="fas fa-palette" onclick="tab('themes')" id="n-themes"></i>
+    <i class="fas fa-user-circle" onclick="tab('prof')" id="n-prof"></i>
 </nav>
 
 <aside class="sidebar">
-    <div id="t-chats" class="tab-content active" style="display:flex; flex-direction:column; height:100%;">
-        <div class="stories-container">
-            <div style="font-size:10px; color:var(--accent); margin-bottom:8px;">ACTIVE_STORIES</div>
-            <div class="stories-row" id="st-row"></div>
-        </div>
+    <div id="t-chats" class="tab-content active">
+        <div class="st-header">ACTIVE_STORIES</div>
+        <div class="st-row" id="st-row"></div>
         <div id="chat-list" style="flex:1; overflow-y:auto;"></div>
     </div>
 
-    <div id="t-search" class="tab-content" style="padding:20px; display:none;">
-        <input type="text" class="input" placeholder="Scaning users..." oninput="findUser(this.value)">
+    <div id="t-search" class="tab-content" style="padding:20px;">
+        <input type="text" class="input-main" placeholder="Deep scanning..." oninput="find(this.value)">
         <div id="search-res" style="margin-top:20px;"></div>
     </div>
 
-    <div id="t-prof" class="tab-content" style="display:none;">
+    <div id="t-themes" class="tab-content">
+        <h3 style="padding:20px; color:var(--accent)">THEMES_UI</h3>
+        <div id="theme-list" class="theme-grid"></div>
+    </div>
+
+    <div id="t-prof" class="tab-content">
         <div style="padding:40px; text-align:center;">
             <div style="position:relative; display:inline-block;">
-                <img id="m-ava" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid var(--accent); object-fit:cover;">
-                <label style="position:absolute; bottom:0; right:0; background:var(--accent); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fas fa-camera" style="color:#000; font-size:12px;"></i><input type="file" hidden onchange="upMedia(this,'ava')"></label>
+                <img id="m-ava" src="" style="width:110px; height:110px; border-radius:50%; border:3px solid var(--accent); object-fit:cover;">
+                <label style="position:absolute; bottom:5px; right:5px; background:var(--accent); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="fas fa-sync" style="color:#000; font-size:12px;"></i><input type="file" hidden onchange="up(this,'ava')"></label>
             </div>
-            <h2 id="m-name" style="margin:15px 0; color:var(--accent);"></h2>
+            <h2 id="m-name" style="margin:15px 0; color:var(--accent);">USER_NULL</h2>
             <div style="display:flex; gap:10px;">
-                <label class="btn" style="flex:1; font-size:12px;">UPLOAD_POST <input type="file" hidden onchange="upMedia(this,'post')"></label>
-                <label class="btn" style="flex:1; font-size:12px; background:#f05;">ADD_STORY <input type="file" hidden onchange="upMedia(this,'story')"></label>
+                <label class="btn" style="flex:1; font-size:11px">NEW_POST <input type="file" hidden onchange="up(this,'post')"></label>
+                <label class="btn" style="flex:1; font-size:11px; background:#f05;">ADD_STORY <input type="file" hidden onchange="up(this,'story')"></label>
             </div>
         </div>
         <div id="m-posts" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:2px;"></div>
     </div>
 </aside>
 
-<main class="chat-main" id="chat-win">
+<main class="chat-win" id="chat-win">
     <div class="chat-header">
-        <i class="fas fa-code-branch" onclick="closeChat()" style="color:var(--accent); cursor:pointer;"></i>
-        <img id="c-ava" src="" style="width:40px; height:40px; border-radius:50%; border:1px solid var(--accent);">
-        <b id="c-name" style="flex:1; letter-spacing:2px;">SESSION_NULL</b>
-        <i class="fas fa-user-cog" onclick="openSet()" style="cursor:pointer;"></i>
+        <i class="fas fa-chevron-left" onclick="closeChat()"></i>
+        <img id="c-ava" src="" style="width:45px; height:45px; border-radius:50%; border:1px solid var(--accent);">
+        <b id="c-name" style="flex:1; letter-spacing:2px;">NULL_CHANNEL</b>
+        <i class="fas fa-cog" onclick="document.getElementById('set-modal').style.display='flex'" style="cursor:pointer"></i>
     </div>
 
     <div class="msg-box" id="msg-box"></div>
 
-    <div id="v-ui" style="display:none; position:absolute; bottom:70px; left:20px; right:20px; background:var(--panel); padding:15px; border-radius:15px; border:1px solid var(--accent); align-items:center;">
-        <div style="width:10px; height:10px; background:red; border-radius:50%; animation:blink 0.5s infinite; margin-right:10px;"></div>
-        <span id="v-timer">00:00</span>
-        <span style="margin-left:auto; font-size:10px; opacity:0.5;">SWIPE_LEFT_TO_CANCEL</span>
+    <div class="emoji-panel" id="emoji-panel">
+        <span onclick="addE('😂')">😂</span><span onclick="addE('❤️')">❤️</span><span onclick="addE('🔥')">🔥</span>
+        <span onclick="addE('💀')">💀</span><span onclick="addE('🤡')">🤡</span><span onclick="addE('😎')">😎</span>
+        <span onclick="addE('👍')">👍</span><span onclick="addE('🤬')">🤬</span><span onclick="addE('👀')">👀</span>
+        <span onclick="addE('⚡')">⚡</span><span onclick="addE('💎')">💎</span><span onclick="addE('🔫')">🔫</span>
+    </div>
+
+    <div class="v-overlay" id="v-ui">
+        <div class="v-rec-dot"></div> <span id="v-timer">00:00</span>
+        <span style="margin-left:auto; opacity:0.5; font-size:11px;">CANCEL <<< SLIDE</span>
     </div>
 
     <div class="input-area">
-        <i class="fas fa-microphone" id="mic" style="font-size:22px; color:var(--accent); cursor:pointer;"></i>
-        <input type="text" id="m-input" class="input" placeholder="Type command..." onkeypress="if(event.key==='Enter') send()">
-        <i class="fas fa-paper-plane" onclick="send()" style="font-size:22px; color:var(--accent); cursor:pointer;"></i>
+        <i class="far fa-smile" onclick="toggleEmoji()" style="font-size:24px; color:var(--accent); cursor:pointer"></i>
+        <i class="fas fa-microphone" id="mic" style="font-size:24px; color:var(--accent); cursor:pointer"></i>
+        <input type="text" id="m-in" class="input-main" placeholder="Transmit data..." onkeypress="if(event.key==='Enter') send()">
+        <i class="fas fa-paper-plane" onclick="send()" style="font-size:24px; color:var(--accent); cursor:pointer"></i>
     </div>
 </main>
 
-<div id="set-modal" class="modal">
-    <div class="modal-card">
-        <h3 style="color:var(--accent);">CHAT_ENCRYPTION_SETTINGS</h3><br>
-        <label class="btn" style="display:block; text-align:center">CHANGE_BACKGROUND <input type="file" hidden onchange="upMedia(this,'bg')"></label><br>
-        <button class="btn" style="width:100%; background:none; border:1px solid #333; color:#fff;" onclick="closeModal()">EXIT</button>
+<div id="create-modal" class="sidebar" style="position:fixed; inset:0; z-index:90000; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; width:100%;">
+    <div class="auth-card">
+        <h3>CREATE_OBJECT</h3><br>
+        <input type="text" id="cr-name" class="input-main" placeholder="Object Name"><br><br>
+        <select id="cr-type" class="input-main"><option value="group">GROUP</option><option value="channel">CHANNEL</option></select><br><br>
+        <button class="btn" onclick="createRoom()">CONFIRM</button>
+        <button class="btn" style="background:none; color:#fff; margin-top:10px" onclick="this.parentElement.parentElement.style.display='none'">ABORT</button>
+    </div>
+</div>
+
+<div id="set-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:90000; display:none; align-items:center; justify-content:center;">
+    <div class="auth-card">
+        <h3>CHANNEL_DATA</h3><br>
+        <label class="btn">CHANGE_WALLPAPER <input type="file" hidden onchange="up(this,'bg')"></label><br>
+        <button class="btn" style="background:none; color:#fff; margin-top:10px" onclick="this.parentElement.parentElement.style.display='none'">CLOSE</button>
     </div>
 </div>
 
@@ -154,56 +198,57 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let me = JSON.parse(localStorage.getItem('v20-u')), curChat, chatPeer;
-    let rec, chunks = [], vInt, vSec = 0, startX;
+    let me = JSON.parse(localStorage.getItem('v22-u')), curChat, chatPeer;
+    let rec, chunks = [], vInt, vSec = 0, startX, sList = [], sIdx = 0, sTimer;
 
-    // Matrix Background
-    const canvas = document.getElementById('matrix-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-    function drawMatrix() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#00f2fe"; ctx.font = fontSize + "px monospace";
+    // Matrix Background Animation
+    const cvs = document.getElementById('matrix');
+    const ctx = cvs.getContext('2d');
+    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+    const drops = Array(Math.floor(cvs.width/18)).fill(1);
+    function drawM() {
+        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,cvs.width,cvs.height);
+        ctx.fillStyle = "#00f2fe"; ctx.font = "15px monospace";
         drops.forEach((y, i) => {
-            const text = chars[Math.floor(Math.random() * chars.length)];
-            ctx.fillText(text, i * fontSize, y * fontSize);
-            if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            const txt = String.fromCharCode(Math.random()*128);
+            ctx.fillText(txt, i*18, y*18);
+            if(y*18 > cvs.height && Math.random() > 0.975) drops[i] = 0;
             drops[i]++;
         });
     }
-    setInterval(drawMatrix, 50);
+    setInterval(drawM, 50);
 
     if(me) initApp(me);
 
-    async function login() {
-        const n = document.getElementById('a-nick').value.toLowerCase().trim(); if(!n) return;
-        const s = await db.ref('users/'+n).once('value');
-        const u = s.exists() ? s.val() : { nick:n, name:n, ava:"", posts:[], stories:[], bg:{} };
-        if(!s.exists()) await db.ref('users/'+n).set(u);
-        initApp(u);
+    async function auth() {
+        const u = document.getElementById('a-user').value.toLowerCase().trim();
+        const p = document.getElementById('a-pass').value.trim();
+        if(!u || !p) return;
+        const s = await db.ref('users/'+u).once('value');
+        const userData = s.exists() ? s.val() : { nick:u, pass:p, name:u, ava:"", posts:[], stories:[], bg:{} };
+        if(s.exists() && userData.pass !== p) return alert("ACCESS_DENIED: WRONG_PASSWORD");
+        if(!s.exists()) await db.ref('users/'+u).set(userData);
+        initApp(userData);
     }
 
     function initApp(u) {
-        me = u; localStorage.setItem('v20-u', JSON.stringify(me));
+        me = u; localStorage.setItem('v22-u', JSON.stringify(me));
         document.getElementById('auth-screen').style.display = 'none';
         db.ref('users/'+me.nick).on('value', s => { 
             me = s.val(); 
-            document.getElementById('m-name').innerText = me.name;
+            document.getElementById('m-name').innerText = me.name.toUpperCase();
             document.getElementById('m-ava').src = me.ava || 'https://via.placeholder.com/100';
-            renderPosts();
+            renderP();
         });
-        loadChats(); loadStories();
+        loadC(); loadS(); initThemes();
     }
 
-    /* --- MESSAGING --- */
-    function openChat(id, name, ava) {
-        curChat = [me.nick, id].sort().join("_"); chatPeer = id;
+    /* --- MESSAGING CORE --- */
+    function openChat(id, name, ava, type) {
+        curChat = type === 'private' ? [me.nick, id].sort().join("_") : id;
+        chatPeer = id;
         document.getElementById('c-name').innerText = name.toUpperCase();
-        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/40';
+        document.getElementById('c-ava').src = ava || 'https://via.placeholder.com/50';
         document.getElementById('chat-win').classList.add('active');
 
         db.ref(`users/${me.nick}/bg/${curChat}`).on('value', s => {
@@ -216,15 +261,12 @@
                 const v = m.val();
                 const d = document.createElement('div');
                 d.className = `msg ${v.s === me.nick ? 'me' : 'other'}`;
-                if(v.type === 'voice') d.innerHTML = `<audio src="${v.t}" controls style="width:200px; height:40px; filter: invert(1);"></audio>`;
+                if(v.type === 'voice') d.innerHTML = `<audio src="${v.t}" controls style="width:210px; height:40px; filter:invert(1) hue-rotate(180deg)"></audio>`;
                 else d.innerText = v.t;
-                if(v.like) d.innerHTML += `<span class="msg-like">❤️</span>`;
-
+                if(v.like) d.innerHTML += `<span class="msg-heart">❤️</span>`;
+                
                 d.ondblclick = () => db.ref(`messages/${curChat}/${m.key}`).update({like: !v.like});
-                d.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    if(confirm("DELETE MESSAGE?")) db.ref(`messages/${curChat}/${m.key}`).remove();
-                };
+                d.oncontextmenu = (e) => { e.preventDefault(); if(confirm("DELETE_DATA?")) db.ref(`messages/${curChat}/${m.key}`).remove(); };
                 box.appendChild(d);
             });
             box.scrollTop = box.scrollHeight;
@@ -232,12 +274,12 @@
     }
 
     function send() {
-        const t = document.getElementById('m-input').value.trim(); if(!t) return;
+        const t = document.getElementById('m-in').value.trim(); if(!t) return;
         db.ref('messages/'+curChat).push({s:me.nick, t, time:Date.now()});
-        document.getElementById('m-input').value = "";
+        document.getElementById('m-in').value = "";
     }
 
-    /* --- GS ENGINE --- */
+    /* --- VOICE GS (TELEGRAM STYLE) --- */
     const mic = document.getElementById('mic');
     mic.onmousedown = vStart; mic.onmouseup = vEnd;
     mic.ontouchstart = (e) => { startX = e.touches[0].clientX; vStart(); };
@@ -245,85 +287,129 @@
     mic.ontouchmove = (e) => { if(startX - e.touches[0].clientX > 70) { chunks = []; vEnd(); } };
 
     async function vStart() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        rec = new MediaRecorder(stream); chunks = [];
+        const s = await navigator.mediaDevices.getUserMedia({audio:true});
+        rec = new MediaRecorder(s); chunks = [];
         rec.ondataavailable = e => chunks.push(e.data);
         rec.onstop = () => {
-            if(chunks.length === 0) return;
+            if(!chunks.length) return;
             const b = new Blob(chunks, {type:'audio/webm'});
             const r = new FileReader(); r.readAsDataURL(b);
             r.onloadend = () => db.ref('messages/'+curChat).push({s:me.nick, t:r.result, type:'voice'});
         };
         rec.start();
-        document.getElementById('v-ui').style.display = 'flex';
-        vSec = 0; vInt = setInterval(() => { vSec++; document.getElementById('v-timer').innerText = new Date(vSec*1000).toISOString().substr(14,5); }, 1000);
+        document.getElementById('v-ui').style.display='flex';
+        vSec=0; vInt=setInterval(()=>{vSec++; document.getElementById('v-timer').innerText=new Date(vSec*1000).toISOString().substr(14,5)},1000);
     }
-    function vEnd() { clearInterval(vInt); if(rec) rec.stop(); document.getElementById('v-ui').style.display = 'none'; }
+    function vEnd(){ clearInterval(vInt); if(rec)rec.stop(); document.getElementById('v-ui').style.display='none'; }
 
-    /* --- CORE SYSTEM --- */
-    async function upMedia(input, type) {
+    /* --- THEMES SYSTEM (10 THEMES) --- */
+    function initThemes() {
+        const themes = [
+            {n:'VOID', a:'#00f2fe', b:'#030508'}, {n:'LAVA', a:'#ff4500', b:'#0a0200'},
+            {n:'TOXIC', a:'#adff2f', b:'#050a00'}, {n:'NEON', a:'#ff00ff', b:'#000000'},
+            {n:'SKY', a:'#00d2ff', b:'#00050a'}, {n:'GOLD', a:'#ffd700', b:'#0a0a00'},
+            {n:'RUBY', a:'#ff0055', b:'#0a0004'}, {n:'MINT', a:'#00ffaa', b:'#000a05'},
+            {n:'CHERRY', a:'#722f37', b:'#0a0002'}, {n:'SNOW', a:'#ffffff', b:'#111111'}
+        ];
+        const grid = document.getElementById('theme-list');
+        themes.forEach(t => {
+            const d = document.createElement('div');
+            d.className = 'theme-card'; d.style.color = t.a; d.style.borderColor = t.a; d.innerText = t.n;
+            d.onclick = () => {
+                document.documentElement.style.setProperty('--accent', t.a);
+                document.documentElement.style.setProperty('--bg', t.b);
+            };
+            grid.appendChild(d);
+        });
+    }
+
+    /* --- STORIES LOGIC --- */
+    function loadS() {
+        db.ref('users').on('value', s => {
+            const r = document.getElementById('st-row'); r.innerHTML = "";
+            s.forEach(u => {
+                const d = u.val();
+                if(d.stories && d.stories.length > 0) r.innerHTML += `<div class="st-item" onclick="openS('${u.key}')"><img src="${d.stories[d.stories.length-1].url}"></div>`;
+            });
+        });
+    }
+    async function openS(nick) {
+        const s = await db.ref('users/'+nick+'/stories').once('value');
+        sList = s.val() || []; sIdx = 0;
+        document.getElementById('sv-modal').style.display = 'flex';
+        showS();
+    }
+    function showS() {
+        clearTimeout(sTimer);
+        const bar = document.getElementById('sv-progress');
+        bar.innerHTML = sList.map((_,i)=>`<div style="flex:1; height:3px; background:rgba(255,255,255,0.2);"><div id="f-${i}" style="width:0%; height:100%; background:#fff; transition:5s linear"></div></div>`).join('');
+        document.getElementById('sv-body').innerHTML = `<img src="${sList[sIdx].url}" style="max-width:100%; max-height:100%; object-fit:contain">`;
+        setTimeout(()=>{ if(document.getElementById('f-'+sIdx)) document.getElementById('f-'+sIdx).style.width = '100%'; }, 50);
+        sTimer = setTimeout(()=>{ if(sIdx<sList.length-1){ sIdx++; showS(); } else closeS(); }, 5000);
+    }
+    function closeS(){ clearTimeout(sTimer); document.getElementById('sv-modal').style.display='none'; }
+    function tapS(e){ if(e.clientX > window.innerWidth/2){ if(sIdx<sList.length-1){ sIdx++; showS(); } else closeS(); } else if(sIdx>0){ sIdx--; showS(); } }
+
+    /* --- UTILS --- */
+    async function up(input, type) {
         const f = input.files[0]; if(!f) return;
         const fd = new FormData(); fd.append("image", f);
         const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB}`, {method:"POST", body:fd});
         const d = await r.json();
         if(d.success) {
             const url = d.data.url;
-            if(type === 'post') {
-                const p = me.posts || []; p.push({url, id: Date.now()});
-                db.ref('users/'+me.nick).update({posts: p});
-            } else if(type === 'story') {
-                const s = me.stories || []; s.push({url, id: Date.now()});
-                db.ref('users/'+me.nick).update({stories: s});
-            } else if(type === 'bg') {
+            if(type==='post'){
+                const p = me.posts || []; p.push({url, id:Date.now()});
+                db.ref('users/'+me.nick).update({posts:p});
+            } else if(type==='story'){
+                const s = me.stories || []; s.push({url, id:Date.now()});
+                db.ref('users/'+me.nick).update({stories:s});
+            } else if(type==='bg'){
                 db.ref(`users/${me.nick}/bg/${curChat}`).set(url);
-                closeModal();
-            } else if(type === 'ava') {
-                db.ref('users/'+me.nick).update({ava: url});
+                document.getElementById('set-modal').style.display='none';
+            } else if(type==='ava'){
+                db.ref('users/'+me.nick).update({ava:url});
             }
         }
     }
 
-    function loadStories() {
-        db.ref('users').on('value', s => {
-            const row = document.getElementById('st-row'); row.innerHTML = "";
-            s.forEach(u => {
-                const d = u.val();
-                if(d.stories && d.stories.length > 0) {
-                    row.innerHTML += `<div class="story-node" onclick="window.open('${d.stories[d.stories.length-1].url}','_blank')"><img src="${d.stories[d.stories.length-1].url}"></div>`;
-                }
-            });
-        });
-    }
-
-    function loadChats() {
+    function loadC() {
         db.ref('friends/'+me.nick).on('value', s => {
             const l = document.getElementById('chat-list'); l.innerHTML = "";
             s.forEach(f => {
                 const d = f.val();
-                l.innerHTML += `<div style="padding:15px; display:flex; gap:15px; align-items:center; cursor:pointer; border-bottom:1px solid #111;" onclick="openChat('${f.key}','${d.name}','${d.ava}')"><img src="${d.ava || 'https://via.placeholder.com/50'}" style="width:50px; height:50px; border-radius:50%; border:1px solid var(--accent)"> <div><b style="color:var(--accent)">${d.name.toUpperCase()}</b><br><span style="font-size:10px; opacity:0.5;">ENCRYPTED_LINK_ESTABLISHED</span></div></div>`;
+                l.innerHTML += `<div class="chat-item" onclick="openChat('${f.key}','${d.name}','${d.ava}','${d.type||'private'}')"><img src="${d.ava||'https://via.placeholder.com/50'}"> <div><b>${d.name.toUpperCase()}</b><br><span style="font-size:10px; opacity:0.5">${d.type||'PRIVATE_LINK'}</span></div></div>`;
             });
         });
     }
 
-    function findUser(q) {
+    async function createRoom() {
+        const n = document.getElementById('cr-name').value; if(!n) return;
+        const id = 'room_'+Date.now(); const t = document.getElementById('cr-type').value;
+        await db.ref('groups/'+id).set({name:n, type:t, id});
+        await db.ref(`friends/${me.nick}/${id}`).set({name:n, type:t});
+        document.getElementById('create-modal').style.display = 'none';
+    }
+
+    function find(q) {
         if(!q) return;
         db.ref('users').once('value', s => {
             let h = "";
-            s.forEach(u => { if(u.key.includes(q)) h += `<div style="padding:15px; border:1px solid var(--accent); margin:5px; cursor:pointer" onclick="addF('${u.key}','${u.val().name}','${u.val().ava}')">ADD_LINK: ${u.val().name}</div>`; });
+            s.forEach(u => { if(u.key.includes(q.toLowerCase())) h += `<div style="padding:15px; border:1px solid var(--accent); margin-bottom:10px; cursor:pointer" onclick="addF('${u.key}','${u.val().name}','${u.val().ava}')">ESTABLISH_LINK: ${u.val().name}</div>`; });
             document.getElementById('search-res').innerHTML = h;
         });
     }
 
-    async function addF(nick, name, ava) { await db.ref(`friends/${me.nick}/${nick}`).set({name, ava}); tab('chats'); }
-    function renderPosts() {
+    async function addF(nick, name, ava) { await db.ref(`friends/${me.nick}/${nick}`).set({name, ava, type:'private'}); tab('chats'); }
+    function renderP() {
         const g = document.getElementById('m-posts'); g.innerHTML = "";
-        if(me.posts) me.posts.slice().reverse().forEach(p => { g.innerHTML += `<img src="${p.url}" style="width:100%; aspect-ratio:1; object-fit:cover; border:1px solid #111;" onclick="if(confirm('DELETE?')) db.ref('users/'+me.nick).update({posts: me.posts.filter(x=>x.id!==p.id)})">`; });
+        if(me.posts) me.posts.slice().reverse().forEach(p => { g.innerHTML += `<img src="${p.url}" style="width:100%; aspect-ratio:1; object-fit:cover; border:1px solid #111;" onclick="if(confirm('PURGE_DATA?')) db.ref('users/'+me.nick).update({posts: me.posts.filter(x=>x.id!==p.id)})">`; });
     }
 
-    function tab(t) { document.querySelectorAll('.tab-content, .nav-bar i').forEach(x => { x.style.display='none'; x.classList.remove('active'); }); document.getElementById('t-'+t).style.display='flex'; document.getElementById('n-'+t).classList.add('active'); document.getElementById('n-'+t).style.display='block'; }
+    function tab(t) { document.querySelectorAll('.tab-content, .nav-side i').forEach(x => { x.classList.remove('active'); if(x.style) x.style.display='none'; }); document.getElementById('t-'+t).style.display='flex'; document.getElementById('n-'+t).classList.add('active'); document.getElementById('n-'+t).style.display='block'; }
     function closeChat() { document.getElementById('chat-win').classList.remove('active'); }
-    function openSet() { document.getElementById('set-modal').style.display='flex'; }
-    function closeModal() { document.getElementById('set-modal').style.display='none'; }
+    function toggleEmoji() { const p = document.getElementById('emoji-panel'); p.style.display = p.style.display==='grid'?'none':'grid'; }
+    function addE(e) { document.getElementById('m-in').value += e; toggleEmoji(); }
 </script>
 </body>
 </html>
